@@ -5,6 +5,6 @@ using namespace boost;
 int 
 main(){
 
-    printf("Hello World\n");
+    printf("figa world\n");
     return EXIT_SUCCESS;
 }
