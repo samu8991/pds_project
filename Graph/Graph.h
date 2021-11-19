@@ -13,6 +13,7 @@
 
 using namespace std;
 using namespace boost;
+
 typedef boost::property<boost::vertex_color_t,int> colorProperty;
 struct vertexDescriptor{int color;};
 typedef boost::adjacency_list<boost::vecS,boost::vecS,
@@ -35,11 +36,47 @@ private:
 
 protected:
     /*** put here help algorithms**/
+    void
+    parallel_count_adj(list<int>& l){
 
+        auto f = [&](int min,int max){
+            auto it = l.begin();
+            std::advance(it,min);
+            for(int i = min; i < max; i++){
+                int j = 0;
+                auto neighbours = boost::adjacent_vertices(i,static_cast<T&>(*this).g);
+                for (auto vd : make_iterator_range(neighbours))j++;
+                l.insert(it,j);
+            }
+        };
+        int step = static_cast<T&>(*this).g.m_vertices.size()/4;
+        int min = 0;
+
+        for(int i = 0; i < 4; i++){
+            if(i == 3 && static_cast<T&>(*this).g.m_vertices.size()%2 != 0){
+                auto handle = async(std::launch::async,f,min,min+step+1);
+            }
+            else auto handle = async(std::launch::async,f,min,min+step);
+            min += step;
+        }
+
+    }
+    int
+    creatq(int n){
+        int q = 0;
+        for(int i=n; i<= 2*n; i++) {
+            if((i%2==0)||(i%3==0)||(i%5==0)||(i%7==0)||(i%9==0)){
+                continue;
+            } else {
+                q=i;
+                break;
+            }
+        }
+        return q;
+    }
 
 public:
     /*** put here algorithms ***/
-
     int&
     template_sequential_algorithm()
     {
@@ -89,6 +126,20 @@ public:
                 } else auto handle = async(std::launch::async, f1, min, min + step);
                 min += step;
             }
+        }
+        return colors;
+    }
+    int&
+    luby(){
+
+        std::unordered_set<int> I;
+        int colors[static_cast<T&>(*this).g.N];
+        int n = static_cast<T&>(*this).g.N;
+        int q = creatq(n);
+        list<int> adj_vrtx;
+        while(static_cast<T&>(*this).g.vertex_set().size() != 0){
+            parallel_count_adj(static_cast<T&>(*this).g,adj_vrtx);
+
         }
         return colors;
     }
