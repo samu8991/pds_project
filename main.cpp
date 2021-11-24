@@ -1,6 +1,5 @@
 #include<iostream>
 
-#include "menu.h"
 #include "Graph/Graph.h"
 using namespace std;
 using namespace boost;
@@ -14,6 +13,12 @@ main(){
                            Pair(2,4), Pair(3,1), Pair(3,4),
                            Pair(4,1) };
     GraphAdjList g(N,edge_array);
-    g.sequential_algorithm();
+    unique_ptr<vector<int>> vec = g.sequential_algorithm();
+    g.printGraph();
+
+    for(auto it = vec->begin(); it < vec->end(); it++)
+        cout << *it << endl;
+
+
     return EXIT_SUCCESS;
 }

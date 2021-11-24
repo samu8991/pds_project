@@ -9,12 +9,14 @@
 #include <boost/graph/adjacency_matrix.hpp>
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/property_map/property_map.hpp>
+#include <boost/graph/graph_utility.hpp>
+#include <memory>
 #include <future>
 
 using namespace std;
 using namespace boost;
 
-struct vertexDescriptor{int color;};
+struct vertexDescriptor { int color; };
 
 typedef boost::adjacency_list<boost::vecS,boost::vecS,
         boost::undirectedS,
@@ -77,12 +79,13 @@ protected:
         return q;
     }
 
+
 public:
     /*** put here algorithms ***/
-    int&
+    unique_ptr<vector<int>>
     sequential_algorithm(){
 
-        int colors[static_cast<T&>(*this).N];
+        std::unique_ptr<vector<int>> colors(new vector<int>(static_cast<T&>(*this).N));
 
         /*************************************random permutation*************************************/
         srand(time(nullptr));
@@ -103,8 +106,8 @@ public:
             int vi = rand_perm.extract(*rand_perm.begin()).value();
             auto neighbours = boost::adjacent_vertices(vi,static_cast<T&>(*this).g);
             for (auto vd : make_iterator_range(neighbours)) {
-                if (colors[vd] != 0)
-                    C.insert(colors[vd]);
+                if (*(colors->begin()+vd) != 0)
+                    C.insert(*(colors->begin()+vd));
             }
             int c = 0;
             bool found = false;
@@ -117,12 +120,14 @@ public:
 
             }
             if(!found) c = last_used_color;
-            colors[vi] = c;
+            *(colors->begin()+vi) = c;
+
             last_used_color++;
             U.extract(vi);
             C.clear();
         }
-        return *colors;
+
+        return std::move(colors);
     }
     int&
     parallel_sequential_algorithm()
@@ -191,6 +196,11 @@ public:
         return colors;
     }
 
+    void
+    printGraph(){
+        boost::print_graph(static_cast<T&>(*this).g);
+    }
+
 };
 
 class GraphCSR:
@@ -201,9 +211,7 @@ private:
     int N;
 public:
 
-    GraphCSR (int N):N(N){
-        g = graphCSR (N);
-    }
+    GraphCSR (int N,vector<Pair>& edge_array);
 };
 
 
@@ -215,11 +223,7 @@ private:
     int N;
 public:
 
-    GraphAdjList (int N,vector<Pair>& edge_array):N(N){
-        g = graphAdjList (N);
-        for (int i = 0; i < 8; ++i)
-            add_edge(edge_array[i].first, edge_array[i].second, g);
-    }
+    GraphAdjList (int N,vector<Pair>& edge_array);
 };
 
 class GraphAdjMatrix:
@@ -230,9 +234,7 @@ private:
     int N;
 public:
 
-    GraphAdjMatrix(int N) : N(N) {
-        g = graphAdjMatrix (N);
-    }
+    GraphAdjMatrix(int N,vector<Pair>& edge_array);
 
 
 };

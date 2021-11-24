@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.20)
+cmake_minimum_required(VERSION 3.17)
 project(pds_project)
 
 set(CMAKE_CXX_STANDARD 17)
@@ -12,5 +12,5 @@ include_directories("../boost_1_76_0")
 
 add_executable(pds_project
         main.cpp
-        Graph/Graph.h menu.h)
+        Graph/Graph.h menu.h Graph/GraphCSR.cpp Graph/GraphAdjList.cpp Graph/GraphAdjMatrix.cpp)
 TARGET_LINK_LIBRARIES( pds_project LINK_PUBLIC ${Boost_LIBRARIES} )
