@@ -14,8 +14,8 @@
 using namespace std;
 using namespace boost;
 
-typedef boost::property<boost::vertex_color_t,int> colorProperty;
 struct vertexDescriptor{int color;};
+
 typedef boost::adjacency_list<boost::vecS,boost::vecS,
         boost::undirectedS,
         vertexDescriptor> graphAdjList;
@@ -27,13 +27,15 @@ typedef boost::compressed_sparse_row_graph<
         boost::bidirectionalS,
         vertexDescriptor> graphCSR;
 
+typedef pair<int,int> Pair;
+
 template <typename T>
 class Graph{
 
 private:
-    Graph(){}
+    Graph()= default;
     friend T;
-
+    int N;
 protected:
     /*** put here help algorithms**/
     void
@@ -78,12 +80,57 @@ protected:
 public:
     /*** put here algorithms ***/
     int&
-    template_sequential_algorithm()
+    sequential_algorithm(){
+
+        int colors[static_cast<T&>(*this).N];
+
+        /*************************************random permutation*************************************/
+        srand(time(nullptr));
+        std::unordered_set<int> rand_perm;
+        while(rand_perm.size() != static_cast<T&>(*this).N){
+            int rand_vert = rand()%static_cast<T&>(*this).N;
+            rand_perm.insert(rand_vert);
+        }
+
+        /***********************************MAIN LOOP************************************************/
+        std::unordered_set<int> U(static_cast<T&>(*this).N);std::unordered_set<int> C;
+
+        int last_used_color = 1; // colors are numerated starting from 1 and are always positive
+
+        for(int i = 0; i < static_cast<T&>(*this).N; i++)U.insert(i);
+
+        for(int i = 0; i < static_cast<T&>(*this).N; i++){
+            int vi = rand_perm.extract(*rand_perm.begin()).value();
+            auto neighbours = boost::adjacent_vertices(vi,static_cast<T&>(*this).g);
+            for (auto vd : make_iterator_range(neighbours)) {
+                if (colors[vd] != 0)
+                    C.insert(colors[vd]);
+            }
+            int c = 0;
+            bool found = false;
+            for(int i = 1; i <= last_used_color; i++ ) {
+                if (C.count(i) == 0) {
+                    c = i;
+                    found = true;
+                    break;
+                }
+
+            }
+            if(!found) c = last_used_color;
+            colors[vi] = c;
+            last_used_color++;
+            U.extract(vi);
+            C.clear();
+        }
+        return *colors;
+    }
+    int&
+    parallel_sequential_algorithm()
     {
         std::unordered_set<int> U,R;
-        for(int i = 0; i < static_cast<T&>(*this).g.N; i++)U.insert(i);
-        int colors[static_cast<T&>(*this).g.N];
-        for(int i = 0; i < static_cast<T&>(*this).g.N; i++)
+        for(int i = 0; i < static_cast<T&>(*this).N; i++)U.insert(i);
+        int colors[static_cast<T&>(*this).N];
+        for(int i = 0; i < static_cast<T&>(*this).N; i++)
             colors[i] = -1;
 
         auto f = [&](int min,int max){
@@ -110,7 +157,7 @@ public:
             U = R;
         };
         while(!U.empty()) {
-            int step = static_cast<T&>(*this).g.N / 4;
+            int step = static_cast<T&>(*this).N / 4;
             int min = 0;
             for (int i = 0; i < 4; i++) {
                 if (i == 3 && static_cast<T&>(*this).g.N % 2 != 0) {
@@ -121,7 +168,7 @@ public:
             //detect conflicts and create recoloring list
             min = 0;
             for (int i = 0; i < 4; i++) {
-                if (i == 3 && static_cast<T&>(*this).g.N % 2 != 0) {
+                if (i == 3 && static_cast<T&>(*this).N % 2 != 0) {
                     auto handle = async(std::launch::async, f1, min, min + step + 1);
                 } else auto handle = async(std::launch::async, f1, min, min + step);
                 min += step;
@@ -133,8 +180,8 @@ public:
     luby(){
 
         std::unordered_set<int> I;
-        int colors[static_cast<T&>(*this).g.N];
-        int n = static_cast<T&>(*this).g.N;
+        int colors[static_cast<T&>(*this).N];
+        int n = static_cast<T&>(*this).N;
         int q = creatq(n);
         list<int> adj_vrtx;
         while(static_cast<T&>(*this).g.vertex_set().size() != 0){
@@ -168,8 +215,10 @@ private:
     int N;
 public:
 
-    GraphAdjList (int N):N(N){
+    GraphAdjList (int N,vector<Pair>& edge_array):N(N){
         g = graphAdjList (N);
+        for (int i = 0; i < 8; ++i)
+            add_edge(edge_array[i].first, edge_array[i].second, g);
     }
 };
 
