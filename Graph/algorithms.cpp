@@ -65,9 +65,9 @@ my_graph::Graph<T>::parallel_sequential_algorithm(){
 
     auto f = [&](int min, int max) {
         int cur_color = 1;
-        for (int i = min; i < max; ++i) {
+        for (unsigned long i = min; i < max; ++i) {
             std::unordered_set<int> c(cur_color);
-            for (int j = 1; j <= cur_color; ++j)c.insert(j);
+            for (unsigned long j = 1; j <= cur_color; ++j)c.insert(j);
             auto neighbours = boost::adjacent_vertices(i, static_cast<T &>(*this).g);
             for (auto vd: make_iterator_range(neighbours))
                 c.extract(colors[vd]);
@@ -78,8 +78,8 @@ my_graph::Graph<T>::parallel_sequential_algorithm(){
     };
     auto f1 = [&](int min, int max) {
         int cur_color = 1;
-        for (int i = min; i < max; ++i) {
-            auto neighbours = boost::adjacent_vertices(i, static_cast<T &>(*this).g.N);
+        for (unsigned long i = min; i < max; ++i) {
+            auto neighbours = boost::adjacent_vertices(i, static_cast<T &>(*this).g);
             for (auto vd: make_iterator_range(neighbours))
                 if (colors[vd] == colors[i])
                     R.insert(i);
@@ -90,7 +90,7 @@ my_graph::Graph<T>::parallel_sequential_algorithm(){
         int step = static_cast<T &>(*this).N / 4;
         int min = 0;
         for (int i = 0; i < 4; i++) {
-            if (i == 3 && static_cast<T &>(*this).g.N % 2 != 0) {
+            if (i == 3 && static_cast<T &>(*this).N % 2 != 0) {
                 auto handle = async(std::launch::async, f, min, min + step + 1);
             } else auto handle = async(std::launch::async, f, min, min + step);
             min += step;
@@ -104,5 +104,14 @@ my_graph::Graph<T>::parallel_sequential_algorithm(){
             min += step;
         }
     }
-    return colors;
+    return;
 }
+
+template
+class my_graph::Graph<my_graph::GraphCSR>;
+
+template
+class my_graph::Graph<my_graph::GraphAdjMatrix>;
+
+template
+class my_graph::Graph<my_graph::GraphAdjList>;

@@ -1,5 +1,6 @@
-#include "Graph/Graph.h"
 #include <iostream>
+#include "Graph/Graph.h"
+
 using namespace std;
 using namespace my_graph;
 #ifdef TEST
@@ -17,10 +18,10 @@ main(){
     const int N = 5;
 
     vector<Pair> edge_array = { Pair(0,1), Pair(0,2), Pair(0,3),
-                           Pair(0,4),
-                           Pair(2,4), Pair(3,1), Pair(3,4),
-                           Pair(4,1) };
-    GraphCSR g(N,edge_array);
+                                Pair(0,4),
+                                Pair(2,4), Pair(3,1), Pair(3,4),
+                                Pair(4,1) };
+    GraphAdjMatrix g(N,edge_array);
     g.printGraph();
     g.sequential_algorithm();
 #ifdef PROVA

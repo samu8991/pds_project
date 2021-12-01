@@ -16,6 +16,7 @@
 #include <future>
 #include <functional>
 
+
 using namespace std;
 using namespace boost;
 
@@ -55,18 +56,18 @@ namespace my_graph {
             auto f = [&](int min, int max) {
                 auto it = l.begin();
                 std::advance(it, min);
-                for (int i = min; i < max; i++) {
+                for (unsigned long i = min; i < max; i++) {
                     int j = 0;
                     auto neighbours = boost::adjacent_vertices(i, static_cast<T &>(*this).g);
                     for (auto vd: make_iterator_range(neighbours))j++;
                     l.insert(it, j);
                 }
             };
-            int step = static_cast<T &>(*this).g.m_vertices.size() / 4;
+            int step = static_cast<T &>(*this).N / 4;
             int min = 0;
 
             for (int i = 0; i < 4; i++) {
-                if (i == 3 && static_cast<T &>(*this).g.m_vertices.size() % 2 != 0) {
+                if (i == 3 && static_cast<T &>(*this).N % 2 != 0) {
                     auto handle = async(std::launch::async, f, min, min + step + 1);
                 } else auto handle = async(std::launch::async, f, min, min + step);
                 min += step;
@@ -107,7 +108,6 @@ namespace my_graph {
 
         void
         printSol() {
-            unsigned long node = 1;
             for (unsigned long i = 0; i < static_cast<T &>(*this).N; ++i)
                 cout << static_cast<T &>(*this).g[i].color << endl;
         }
@@ -180,4 +180,4 @@ namespace my_graph {
 
     };
 }
-#endif //PDS_PRJ_GRAPH_H
+#endif //PDS_PROJECT_GRAPH_H
