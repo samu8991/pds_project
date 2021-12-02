@@ -15,6 +15,7 @@
 #include <memory>
 #include <future>
 #include <functional>
+#include <thread>
 
 
 using namespace std;
@@ -24,6 +25,7 @@ using namespace boost;
 namespace my_graph {
     struct vertex_descriptor {
         int color;
+        bool isDeleted;
     };
 
     typedef boost::adjacency_list<boost::vecS, boost::vecS,
@@ -36,20 +38,20 @@ namespace my_graph {
     typedef boost::compressed_sparse_row_graph<
             boost::bidirectionalS,
             vertex_descriptor> graphCSR;
-
-    typedef pair<int, int> Pair;
+    typedef unsigned long node;
+    typedef pair<node, node> Pair;
 
     template<typename T>
     class Graph {
 
     private:
         Graph() = default;
-
         friend T;
     protected:
-        /*** put here help algorithms**/
         int N;
-
+        int current_vertex_no;
+        int threadAvailable = std::thread::hardware_concurrency();
+    protected:
         void
         parallel_count_adj(list<int> &l) {
 
@@ -63,11 +65,12 @@ namespace my_graph {
                     l.insert(it, j);
                 }
             };
-            int step = static_cast<T &>(*this).N / 4;
+            int step = static_cast<T &>(*this).N / static_cast<T&>(*this).threadAvailable;
             int min = 0;
 
-            for (int i = 0; i < 4; i++) {
-                if (i == 3 && static_cast<T &>(*this).N % 2 != 0) {
+            for (int i = 0; i < static_cast<T &>(*this).threadAvailable; i++) {
+                if (i == static_cast<T &>(*this).threadAvailable
+                        && static_cast<T &>(*this).N % 2 != 0) {
                     auto handle = async(std::launch::async, f, min, min + step + 1);
                 } else auto handle = async(std::launch::async, f, min, min + step);
                 min += step;
@@ -75,9 +78,42 @@ namespace my_graph {
 
         }
 
+        void
+        second_phase_luby(std::unordered_set<unsigned long>& I,list<int> d,int q){
+            unsigned long i = 0;
+            for(auto it = d.begin(); it != d.end(); ++it){
+                if(*it == 0){
+                    I.insert(i);
+                    static_cast<T&>(*this).g[i].isDeleted = true;
+                }
+                if(*it >= static_cast<T&>(*this).N/16){
+                    I.insert(i);
+
+                }
+                else{
+                    std::unordered_set<int> X;
+                    int y = rand()%(q-1);
+                    int x = rand()%(q-1)+1;
+                    list<std::thread> threads(static_cast<T&>(*this).threadAvailable);
+                    auto f = [&](){
+                        //TODO
+                        vector<std::pair<int,int>> ret;
+                        return ret;
+                    };
+                    for (int i = 0; i < static_cast<T&>(*this).threadAvailable; i++)
+                        threads.emplace_back(f);
+                    for(auto& t:threads)t.join();
+                    std::unordered_set<int> I_p(X);
+
+
+                }
+
+            }
+        }
         int
-        creatq(int n) {
+        creat_prime() {
             int q = 0;
+            int n = static_cast<T&>(*this).N;
             for (int i = n; i <= 2 * n; i++) {
                 if ((i % 2 == 0) || (i % 3 == 0) || (i % 5 == 0) || (i % 7 == 0) || (i % 9 == 0)) {
                     continue;
@@ -88,6 +124,8 @@ namespace my_graph {
             }
             return q;
         }
+
+
         /*
         void
         for_each_neigh(unsigned long node,unsigned long n,std::function<void()> f){
@@ -102,13 +140,14 @@ namespace my_graph {
         /*** put here algorithms ***/
         void
         sequential_algorithm();
-
         void
         parallel_sequential_algorithm();
+        void
+        luby();
 
         void
         printSol() {
-            for (unsigned long i = 0; i < static_cast<T &>(*this).N; ++i)
+            for (node i = 0; i < static_cast<T &>(*this).N; ++i)
                 cout << static_cast<T &>(*this).g[i].color << endl;
         }
 
@@ -116,15 +155,24 @@ namespace my_graph {
         printGraph() {
             boost::print_graph(static_cast<T &>(*this).g);
         }
+        int
+        degree(node node){
+            return static_cast<T &>(*this).degree(node);
+        }
 
         void
-        for_each_vertex(unsigned long node, std::function<void()> f) {
+        for_each_vertex(node node, std::function<void()> f) {
             return static_cast<T &>(*this).for_each_vertex(node, f);
         }
 
         void
-        for_each_neigh(unsigned long node, unsigned long* n, std::function<void()> f) {
+        for_each_neigh(node node, ::my_graph::node* n, std::function<void()> f) {
             return static_cast<T &>(*this).for_each_neigh(node, n, f);
+        }
+
+        void
+        for_each_edge(std::function<void()> f){
+            return static_cast<T &>(*this).for_each_edge(f);
         }
     };
 
@@ -139,10 +187,16 @@ namespace my_graph {
         GraphCSR(int N, vector<Pair> &edge_array);
 
         void
-        for_each_vertex(unsigned long node, std::function<void()> f);
+        for_each_vertex(node node, std::function<void()> f);
 
         void
-        for_each_neigh(unsigned long node, unsigned long* n,std::function<void()> f);
+        for_each_neigh(node node, ::my_graph::node* n,std::function<void()> f);
+
+        int
+        degree(node node);
+
+        void
+        for_each_edge(std::function<void()> f);
     };
 
 
@@ -156,10 +210,16 @@ namespace my_graph {
         GraphAdjList(int N, vector<Pair> &edge_array);
 
         void
-        for_each_vertex(unsigned long node, std::function<void()> f);
+        for_each_vertex(node node, std::function<void()> f);
 
         void
-        for_each_neigh(unsigned long node, unsigned long* n, std::function<void()> f);
+        for_each_neigh(node node, unsigned long* n, std::function<void()> f);
+
+        void
+        for_each_edge(std::function<void()> f);
+
+        int
+        degree(node node);
     };
 
     class GraphAdjMatrix :
@@ -172,12 +232,16 @@ namespace my_graph {
         GraphAdjMatrix(int N, vector<Pair> &edge_array);
 
         void
-        for_each_vertex(unsigned long node, std::function<void()> f);
+        for_each_vertex(node node, std::function<void()> f);
 
         void
-        for_each_neigh(unsigned long node,unsigned long* n, std::function<void()> f);
+        for_each_neigh(node node,::my_graph::node* n, std::function<void()> f);
 
+        void
+        for_each_edge(std::function<void()> f);
 
+        int
+        degree(node node);
     };
 }
 #endif //PDS_PROJECT_GRAPH_H

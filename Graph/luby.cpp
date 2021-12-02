@@ -307,7 +307,7 @@ void luby(Graph& g){
         Graph gPrime;
         copy_graph(g, gPrime);
 
-        //Creating a property_map with the degrees of the degrees of each vertex
+        //Creating a property_map with the degrees of each vertex
         property_map<Graph, vertex_degree_t>::type deg = get(vertex_degree, gPrime);
         property_map<Graph, vertex_removed_t>::type removed = get(vertex_removed, gPrime);
 

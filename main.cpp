@@ -21,7 +21,7 @@ main(){
                                 Pair(0,4),
                                 Pair(2,4), Pair(3,1), Pair(3,4),
                                 Pair(4,1) };
-    GraphAdjMatrix g(N,edge_array);
+    GraphCSR g(N,edge_array);
     g.printGraph();
     g.sequential_algorithm();
 #ifdef PROVA
