@@ -38,7 +38,13 @@ namespace my_graph {
     typedef boost::compressed_sparse_row_graph<
             boost::bidirectionalS,
             vertex_descriptor> graphCSR;
+
+#ifdef _WIN32
+    typedef unsigned int node;
+#else
     typedef unsigned long node;
+#endif
+
     typedef pair<node, node> Pair;
 
     template<typename T>
@@ -220,7 +226,7 @@ namespace my_graph {
         for_each_vertex(node node, std::function<void()> f);
 
         void
-        for_each_neigh(node node, unsigned long* n, std::function<void()> f);
+        for_each_neigh(node node, ::my_graph::node* n, std::function<void()> f);
 
         void
         for_each_edge(std::function<void()> f);
