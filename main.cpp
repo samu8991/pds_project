@@ -4,86 +4,34 @@
 using namespace std;
 using namespace my_graph;
 
-#define DAVIDE
-#ifdef TEST
-class WebPage
-{
-public:
-    std::string url;
-};
+void
+readFile(){
 
-#endif
+}
+void
+start(){
 
-string fileName(){
-    string firstName = "C:\\Users\\neyma\\CLionProjects\\untitled4\\";
-    string finalName;
-    cout << "Inserisci il nome del file: ";
-    cin >> finalName;
-    return firstName.append(finalName);
+}
+void
+run_simulation(int V,vector<Pair> p){
+
 }
 
-ifstream readFile(){
-    ifstream inFile;
-    do{
-        inFile.open(fileName(), std::ifstream::in);
-        if(!inFile) {
-            cout << "File non trovato" << endl;
-            //throw(inFile.fail());
-        }
-    }while(!inFile);
-    return inFile;
-}
-
-vector <Pair> getAdjacencies(node &N){
-    ifstream file = readFile();
-    vector <Pair> pairs;
-
-    std::string line;
-    std::vector<std::string> firstLine; //nodi e archi
-    getline(file, line);
-    boost::split(firstLine, line, [](char c){return c == ' ';});
-    N = stoi(firstLine[0]);
-    node edges = stoi(firstLine[1]);
-    node n = 1;
-    while(getline(file, line)) {
-        std::set<std::string> adjacencies;
-        boost::split(adjacencies, line, [](char c){return c == ' ';});
-        for (auto x : adjacencies){
-            node adjs;
-            stringstream(x)>>adjs;
-
-            //cout << "adj: " << a << endl;
-            //rgg_n_2_15_s0.graph
-            Pair p;
-            p.first = n;
-            p.second = adjs;
-
-            pairs.push_back(p);
-        }
-        n++;
-    }
-    return pairs;
-}
+int 
+main(){
+    string fileName;
 
 
+  /*  const int N = 5;
 
-
-/*graphCSR createGraph(int& nodes){
-    vector <Pair> pairs = getAdjacencies(nodes);
-    GraphCSR g (nodes, pairs);
-    for(auto x : pairs)
-        if(!edge(x.first, x.second, g).second)
-            add_edge(x.first, x.second, g);
-    return g;
-}
-*/
-int main(){
-
-    node N = 0;
-    vector <Pair> edges = getAdjacencies(N);
-    GraphAdjMatrix g(N,edges);
+    vector<Pair> edge_array = { Pair(0,1), Pair(0,2), Pair(0,3),
+                                Pair(0,4),
+                                Pair(2,4), Pair(3,1), Pair(3,4),
+                                Pair(4,1) };
+    GraphCSR g(N,edge_array);
     g.printGraph();
-//    g.sequential_algorithm();
+    g.sequential_algorithm();*/
+
 #ifdef PROVA
     unique_ptr<vector<int>> vec = g.sequential_algorithm();
 
@@ -127,8 +75,6 @@ int main(){
     std::ofstream out("web-graph.dot");
     write_graphviz(out, g, dp, std::string(), get(vertex_index, g));
 #endif
-#ifdef DAVIDE
 
-#endif
     return EXIT_SUCCESS;
 }

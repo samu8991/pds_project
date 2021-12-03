@@ -28,9 +28,9 @@ namespace my_graph {
         bool isDeleted;
     };
 
-    typedef boost::adjacency_list<boost::vecS, boost::vecS,
-            boost::undirectedS,
-            vertex_descriptor> graphAdjList;
+    typedef boost::adjacency_list<boost::listS,
+                                    boost::vecS,
+                                        boost::directedS,vertex_descriptor> graphAdjList;
 
     typedef boost::adjacency_matrix<boost::undirectedS,
             vertex_descriptor> graphAdjMatrix;
@@ -58,7 +58,7 @@ namespace my_graph {
             auto f = [&](int min, int max) {
                 auto it = l.begin();
                 std::advance(it, min);
-                for (unsigned long i = min; i < max; i++) {
+                for (node i = min; i < max; i++) {
                     int j = 0;
                     auto neighbours = boost::adjacent_vertices(i, static_cast<T &>(*this).g);
                     for (auto vd: make_iterator_range(neighbours))j++;
@@ -79,8 +79,8 @@ namespace my_graph {
         }
 
         void
-        second_phase_luby(std::unordered_set<unsigned long>& I,list<int> d,int q){
-            unsigned long i = 0;
+        second_phase_luby(std::unordered_set<node>& I,list<int> d,int q){
+            node i = 0;
             for(auto it = d.begin(); it != d.end(); ++it){
                 if(*it == 0){
                     I.insert(i);
@@ -88,7 +88,11 @@ namespace my_graph {
                 }
                 if(*it >= static_cast<T&>(*this).N/16){
                     I.insert(i);
-
+                    node* n;
+                    for_each_neigh(i,n,[&](){
+                        static_cast<T&>(*this).g[i].isDeleted = true;
+                        static_cast<T&>(*this).g[*n].isDeleted = true;
+                    });
                 }
                 else{
                     std::unordered_set<int> X;
@@ -97,15 +101,29 @@ namespace my_graph {
                     list<std::thread> threads(static_cast<T&>(*this).threadAvailable);
                     auto f = [&](){
                         //TODO
-                        vector<std::pair<int,int>> ret;
+                        vector<Pair> ret;
                         return ret;
                     };
-                    for (int i = 0; i < static_cast<T&>(*this).threadAvailable; i++)
+                    for (int j= 0; j < static_cast<T&>(*this).threadAvailable; i++)
                         threads.emplace_back(f);
                     for(auto& t:threads)t.join();
                     std::unordered_set<int> I_p(X);
-
-
+                    auto f1 = [&](){
+                        //TODO
+                        vector<std::pair<int,int>> ret;
+                        return ret;
+                    };
+                    std::copy(std::begin(I_p),std::end(I_p),std::inserter(I,std::end(I)));
+                    std::unordered_set<node> N;
+                    node* n;
+                    for_each_neigh(i,n,[&](){
+                       N.insert(*n);
+                    });
+                    i++;
+                    std::copy(std::begin(N),std::end(N),std::inserter(I_p,std::end(I_p)));
+                    for_each_vertex(i,[&](){
+                       static_cast<T&>(*this).g[i].isDeleted = true;
+                    });
                 }
 
             }
@@ -124,17 +142,6 @@ namespace my_graph {
             }
             return q;
         }
-
-
-        /*
-        void
-        for_each_neigh(unsigned long node,unsigned long n,std::function<void()> f){
-            auto neighbours = boost::adjacent_vertices(node,static_cast<T&>(*this).g);
-            for (auto vd : make_iterator_range(neighbours)) {
-                n = vd;
-                f();
-            }
-        }*/
 
     public:
         /*** put here algorithms ***/

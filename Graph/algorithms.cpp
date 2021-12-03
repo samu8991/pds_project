@@ -25,8 +25,8 @@ my_graph::Graph<T>::sequential_algorithm() {
     for (int i = 0; i < static_cast<T &>(*this).N; i++)U.insert(i);
 
     for (int i = 0; i < static_cast<T &>(*this).N; i++) {
-        unsigned long vi = rand_perm.extract(*rand_perm.begin()).value();
-        unsigned long n;
+        node vi = rand_perm.extract(*rand_perm.begin()).value();
+        node n;
         for_each_neigh(vi,&n,[this,&n,&C](){
             if (static_cast<T &>(*this).g[n].color != -1)
                 C.insert(static_cast<T &>(*this).g[n].color);
@@ -48,6 +48,7 @@ my_graph::Graph<T>::sequential_algorithm() {
         }
         if (!found)c = last_used_color;
         static_cast<T &>(*this).g[vi].color = c;
+        cout << "assegnato al nodo " << vi << " il colore: " << c << endl;
         last_used_color++;
         U.extract(vi);
         C.clear();

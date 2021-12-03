@@ -36,7 +36,6 @@ GraphCSR::for_each_neigh(node current_vertex,node* n,std::function<void()> f){
     AdjacencyIterator end{};
     for(auto[neighbor,end] = boost::adjacent_vertices(current_vertex,this->g);
         neighbor != end; ++neighbor){
-        cout << *neighbor << endl;
         *n = *neighbor;
         f();
     }
