@@ -1,26 +1,61 @@
 #include <iostream>
+#include <fstream>
+#include <string>
 #include "Graph/Graph.h"
 
 using namespace std;
 using namespace my_graph;
 
-void
-readFile(){
+void credits(){
 
 }
 void
-start(){
+readFile(string& fname){
+    string line;int V,E;
+    string buffer;
+    stringstream lineStream;
+    vector<Pair> edges;
+    fstream fin(fname, ios::in);
+    if(!fin.is_open()) {
+        cerr << "errore apertura file fin" << endl;
+    }
+
+    std::getline(fin, line);
+    lineStream = stringstream(line);
+    lineStream >> V >> E;
+
+    int neighbour;
+    edges.reserve(E); //riservo E posti,
+
+    for(int i=0; i<V; i++){
+        getline(fin, line);
+        lineStream = stringstream(line);
+        while(lineStream >> neighbour)
+            edges.emplace_back(Pair(i,neighbour-1));
+    }
+    fin.close();
+}
+void
+start(string& filename,int16_t r,int16_t a){
+    readFile(filename);
 
 }
 void
-run_simulation(int V,vector<Pair> p){
+run_simulation(int V,vector<Pair>& p){
 
 }
 
 int 
 main(){
-    string fileName;
-
+    string fileName;int16_t r,a;
+    credits();
+    cout << "Inserire il nome del file >> ";
+    cin >> fileName;
+    cout << "Inserire rappresentazione del grafo >> ";
+    cin >> r;
+    cout << "Inserire algoritmo >> ";
+    cin >> a;
+    start(fileName,r,a);
 
   /*  const int N = 5;
 
