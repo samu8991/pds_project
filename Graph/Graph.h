@@ -20,7 +20,7 @@
 
 using namespace std;
 using namespace boost;
-
+using namespace std::chrono;
 
 namespace my_graph {
     struct vertex_descriptor {
@@ -151,7 +151,28 @@ namespace my_graph {
         parallel_sequential_algorithm();
         void
         luby();
+        void
+        startAlg(int16_t a){
+            auto start = high_resolution_clock::now();
+            switch (a) {
+                case 0:{
+                    sequential_algorithm();
+                    break;
+                }
+                case 1:{
+                    break;
+                }
+                case 2:{
+                    break;
+                }
+                default:
+                    break;
 
+            }
+            auto stop = high_resolution_clock::now();
+            auto duration = duration_cast<microseconds>(stop - start);
+            cout << "Tempo di esecuzione " << duration.count()<<"micros" << endl;
+        }
         void
         printSol() {
             for (node i = 0; i < static_cast<T &>(*this).N; ++i)

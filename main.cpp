@@ -50,7 +50,7 @@ run_simulation(int V,int16_t r,int16_t a,vector<Pair>& edges){
     switch (r) {
         case 0:{
             GraphAdjList g(V,edges);
-            g.printGraph();
+            g.startAlg(a);
             break;
         }
         case 1:{
@@ -61,7 +61,7 @@ run_simulation(int V,int16_t r,int16_t a,vector<Pair>& edges){
         case 2:{
            GraphCSR g(V, edges);
            g.sequential_algorithm();
-            break;
+           break;
         }
         default:
             break;

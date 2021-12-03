@@ -52,7 +52,6 @@ my_graph::Graph<T>::sequential_algorithm() {
         U.extract(vi);
         C.clear();
     }
-    printSol();
     return;
 }
 
