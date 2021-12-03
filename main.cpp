@@ -10,11 +10,11 @@ void credits(){
 
 }
 void
-readFile(string& fname){
-    string line;int V,E;
+readFile(string& fname,vector<Pair>& edges,int& V){
+
+    string line;int E;
     string buffer;
     stringstream lineStream;
-    vector<Pair> edges;
     fstream fin(fname, ios::in);
     if(!fin.is_open()) {
         cerr << "errore apertura file fin" << endl;
@@ -36,17 +36,39 @@ readFile(string& fname){
     fin.close();
 }
 void
-start(string& filename,int16_t r,int16_t a){
-    readFile(filename);
+run_simulation(int V,int16_t r,int16_t a,vector<Pair>& edges){
+    switch (r) {
+        case 0:{
+            GraphAdjList g(V,edges);
+            g.printGraph();
+            break;
+        }
+        case 1:{
+            GraphAdjMatrix g(V,edges);
+            g.printGraph();
+            break;
+        }
+        case 2:{
+           GraphCSR g(V, edges);
+           g.printGraph();
+            break;
+        }
+        default:
+            break;
 
+    }
 }
 void
-run_simulation(int V,vector<Pair>& p){
+start(string& filename,int16_t r,int16_t a){
+    vector<Pair> edges;int V;
+    readFile(filename,edges,V);
+    run_simulation(V,r,a,edges);
+
 
 }
-
 int 
 main(){
+    ///home/voidjocker/Downloads/quer_project_01_COLORING/benchmarks/rgg_n_2_15_s0.graph
     string fileName;int16_t r,a;
     credits();
     cout << "Inserire il nome del file >> ";
