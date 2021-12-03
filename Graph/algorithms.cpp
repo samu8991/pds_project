@@ -48,7 +48,6 @@ my_graph::Graph<T>::sequential_algorithm() {
         }
         if (!found)c = last_used_color;
         static_cast<T &>(*this).g[vi].color = c;
-        cout << "assegnato al nodo " << vi << " il colore: " << c << endl;
         last_used_color++;
         U.extract(vi);
         C.clear();

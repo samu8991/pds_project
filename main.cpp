@@ -7,7 +7,17 @@ using namespace std;
 using namespace my_graph;
 
 void credits(){
-
+    std::cout << "**************************************CREDITS*********************************************\n";
+    std::cout << "Vertex Coloring Project" << '\n';
+    std::cout << "Politenico di Torino 2020/2021\n";
+    std::cout << "Professors:\n";
+    std::cout << " - Alessandro Savino\n";
+    std::cout << " - Stefano Quer\n";
+    std::cout << "Students:\n";
+    std::cout << " - Paone Samuele\n";
+    std::cout << " - Manca Davide\n";
+    std::cout << " - Vitali Giacomo\n";
+    std::cout << "******************************************************************************************\n";
 }
 void
 readFile(string& fname,vector<Pair>& edges,int& V){
@@ -50,7 +60,7 @@ run_simulation(int V,int16_t r,int16_t a,vector<Pair>& edges){
         }
         case 2:{
            GraphCSR g(V, edges);
-           g.printGraph();
+           g.sequential_algorithm();
             break;
         }
         default:
@@ -59,18 +69,23 @@ run_simulation(int V,int16_t r,int16_t a,vector<Pair>& edges){
     }
 }
 void
+menu(){
+
+    cout << "Menu da fare \n";
+}
+void
 start(string& filename,int16_t r,int16_t a){
     vector<Pair> edges;int V;
+
     readFile(filename,edges,V);
     run_simulation(V,r,a,edges);
-
-
 }
 int 
 main(){
     ///home/voidjocker/Downloads/quer_project_01_COLORING/benchmarks/rgg_n_2_15_s0.graph
     string fileName;int16_t r,a;
     credits();
+    menu();
     cout << "Inserire il nome del file >> ";
     cin >> fileName;
     cout << "Inserire rappresentazione del grafo >> ";
