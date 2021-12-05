@@ -2,9 +2,7 @@
 #include <fstream>
 #include <string>
 #include "Graph/Graph.h"
-#include <boost/property_map/dynamic_property_map.hpp>
-#include <boost/graph/graphviz.hpp>
-
+#include <filesystem>
 #define MAIN
 
 using namespace std;
@@ -25,7 +23,8 @@ void credits(){
 }
 void
 readFile(string& fname,vector<Pair>& edges,int& V){
-
+    string base ="/home/voidjocker/CLionProjects/pds_project/benchmarks/";
+    fname = base+fname;
     string line;int E;
     string buffer;
     stringstream lineStream;
@@ -64,7 +63,7 @@ run_simulation(int V,int16_t r,int16_t a,vector<Pair>& edges){
         }
         case 2:{
            GraphCSR g(V, edges);
-            g.startAlg(a);
+           g.startAlg(a);
            break;
         }
         default:
@@ -82,40 +81,41 @@ menu(){
     cout << "- Adjacent List\n- Adjacency Matrix\n- Compressed Sparse Row\n";
 }
 void
+show_benchmarks(){
+    cout<< "This is the list of benchmarks used to test these algorithms...\n";
+    std::string constructed_path_str_dbg = "/home/voidjocker/CLionProjects/pds_project/benchmarks/";
+    std::string ext(".graph");
+    for (auto& p : filesystem::recursive_directory_iterator(constructed_path_str_dbg))
+    {
+        if (p.path().extension() == ext)
+            std::cout << p << '\n';
+    }
+}
+void
 start(){
     vector<Pair> edges;int V;
     string fileName;int16_t r,a;
     credits();
     menu();
-    cout << "Inserire il nome del file >> ";
+    show_benchmarks();
+    cout << "Choose the graph you want to use for this test >> ";
     cin >> fileName;
-    cout << "Inserire rappresentazione del grafo >> ";
+    cout << "Choose the rappresentation >> ";
     cin >> r;
-    cout << "Inserire algoritmo >> ";
+    cout << "Choose the algorithm >> ";
     cin >> a;
     readFile(fileName,edges,V);
     run_simulation(V,r,a,edges);
 }
 #endif
-struct WebPage{
-    string url = "";
-};
+
 int 
 main(){
 #ifdef MAIN
-    ///home/voidjocker/Downloads/quer_project_01_COLORING/benchmarks/rgg_n_2_15_s0.graph
     start();
     return EXIT_SUCCESS;
 #endif
 
-#ifdef PROVA
-    unique_ptr<vector<int>> vec = g.sequential_algorithm();
-
-    g.printGraph();
-
-    for(auto it = vec->begin(); it < vec->end(); it++)
-        cout << *it << endl;
-#endif
 #ifdef TEST
     typedef std::pair<int, int> E;
     const char* urls[6] = {

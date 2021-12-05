@@ -198,7 +198,9 @@ namespace my_graph {
             else{
                 high_resolution_clock::time_point end = high_resolution_clock::now();
                 auto duration = duration_cast<microseconds>(end - start);
-                cout << "Tempo di esecuzione " << duration.count() << "\u03BCs" << endl;
+                auto durations = duration_cast<seconds>(end - start);
+                cout << "Execution time >> " << duration.count() << "\u03BCs" << "(" << durations.count() <<"s)"<<endl;
+                cout << "Simulation ended\n";
             }
             t1.join();
         }
