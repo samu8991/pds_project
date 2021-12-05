@@ -154,10 +154,6 @@ namespace my_graph {
         }
 
     public:
-        void
-        thread_function(){
-
-        }
         /*** put here algorithms ***/
         void
         sequential_algorithm();
@@ -171,13 +167,18 @@ namespace my_graph {
             cout << "Starting simulation...\n";
             high_resolution_clock::time_point start = high_resolution_clock::now();
             thread t1([&](){
-                std::this_thread::sleep_for(std::chrono::seconds(5));
+                int end = 60;
+                int t = 0;
+                while(!alg_finished && t < end){
+                    std::this_thread::sleep_for(std::chrono::milliseconds (1000));
+                    t++;
+                }
                 if(!alg_finished)exit_thread_flag = true;
+                else;
             });
             switch (a) {
                 case 0: {
                     sequential_algorithm();
-                    alg_finished = true;
                     break;
                 }
                 case 1: {
@@ -189,13 +190,15 @@ namespace my_graph {
                 default:
                         break;
             }
+            alg_finished = true;
             if(exit_thread_flag){
                 cout << "Time exceded\n";
+
             }
             else{
                 high_resolution_clock::time_point end = high_resolution_clock::now();
                 auto duration = duration_cast<microseconds>(end - start);
-                cout << "Tempo di esecuzione " << duration.count() << "micros" << endl;
+                cout << "Tempo di esecuzione " << duration.count() << "\u03BCs" << endl;
             }
             t1.join();
         }

@@ -105,16 +105,7 @@ main(){
 #ifdef MAIN
     ///home/voidjocker/Downloads/quer_project_01_COLORING/benchmarks/rgg_n_2_15_s0.graph
     start();
-
-  /*  const int N = 5;
-
-    vector<Pair> edge_array = { Pair(0,1), Pair(0,2), Pair(0,3),
-                                Pair(0,4),
-                                Pair(2,4), Pair(3,1), Pair(3,4),
-                                Pair(4,1) };
-    GraphCSR g(N,edge_array);
-    g.printGraph();
-    g.sequential_algorithm();*/
+    return EXIT_SUCCESS;
 #endif
 
 #ifdef PROVA
@@ -160,6 +151,4 @@ main(){
     std::ofstream out("web-graph.dot");
     write_graphviz(out, g, dp, std::string(), get(vertex_index, g));
 #endif
-
-    return EXIT_SUCCESS;
 }
