@@ -82,10 +82,18 @@ menu(){
     cout << "- Adjacent List\n- Adjacency Matrix\n- Compressed Sparse Row\n";
 }
 void
-start(string& filename,int16_t r,int16_t a){
+start(){
     vector<Pair> edges;int V;
-
-    readFile(filename,edges,V);
+    string fileName;int16_t r,a;
+    credits();
+    menu();
+    cout << "Inserire il nome del file >> ";
+    cin >> fileName;
+    cout << "Inserire rappresentazione del grafo >> ";
+    cin >> r;
+    cout << "Inserire algoritmo >> ";
+    cin >> a;
+    readFile(fileName,edges,V);
     run_simulation(V,r,a,edges);
 }
 #endif
@@ -96,16 +104,7 @@ int
 main(){
 #ifdef MAIN
     ///home/voidjocker/Downloads/quer_project_01_COLORING/benchmarks/rgg_n_2_15_s0.graph
-    string fileName;int16_t r,a;
-    credits();
-    menu();
-    cout << "Inserire il nome del file >> ";
-    cin >> fileName;
-    cout << "Inserire rappresentazione del grafo >> ";
-    cin >> r;
-    cout << "Inserire algoritmo >> ";
-    cin >> a;
-    start(fileName,r,a);
+    start();
 
   /*  const int N = 5;
 
