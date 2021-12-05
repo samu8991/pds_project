@@ -2,10 +2,14 @@
 #include <fstream>
 #include <string>
 #include "Graph/Graph.h"
+#include <boost/property_map/dynamic_property_map.hpp>
+#include <boost/graph/graphviz.hpp>
+
+#define MAIN
 
 using namespace std;
 using namespace my_graph;
-
+#ifdef MAIN
 void credits(){
     std::cout << "**************************************CREDITS*********************************************\n";
     std::cout << "Vertex Coloring Project" << '\n';
@@ -55,12 +59,12 @@ run_simulation(int V,int16_t r,int16_t a,vector<Pair>& edges){
         }
         case 1:{
             GraphAdjMatrix g(V,edges);
-            g.printGraph();
+            g.startAlg(a);
             break;
         }
         case 2:{
            GraphCSR g(V, edges);
-           g.sequential_algorithm();
+            g.startAlg(a);
            break;
         }
         default:
@@ -80,8 +84,13 @@ start(string& filename,int16_t r,int16_t a){
     readFile(filename,edges,V);
     run_simulation(V,r,a,edges);
 }
+#endif
+struct WebPage{
+    string url = "";
+};
 int 
 main(){
+#ifdef MAIN
     ///home/voidjocker/Downloads/quer_project_01_COLORING/benchmarks/rgg_n_2_15_s0.graph
     string fileName;int16_t r,a;
     credits();
@@ -103,6 +112,7 @@ main(){
     GraphCSR g(N,edge_array);
     g.printGraph();
     g.sequential_algorithm();*/
+#endif
 
 #ifdef PROVA
     unique_ptr<vector<int>> vec = g.sequential_algorithm();
@@ -142,7 +152,7 @@ main(){
                       << std::endl;
 
     // Output the graph in DOT format
-    dynamic_properties dp;
+    boost::dynamic_properties dp;
     dp.property("label", get(&WebPage::url, g));
     std::ofstream out("web-graph.dot");
     write_graphviz(out, g, dp, std::string(), get(vertex_index, g));

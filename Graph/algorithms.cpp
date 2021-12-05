@@ -8,50 +8,47 @@ template<typename T>
 void
 my_graph::Graph<T>::sequential_algorithm() {
 
-    /*************************************random permutation*************************************/
-    srand(time(nullptr));
-    std::unordered_set<int> rand_perm;
-    while (rand_perm.size() != static_cast<T &>(*this).N) {
-        int rand_vert = rand() % static_cast<T &>(*this).N;
-        rand_perm.insert(rand_vert);
-    }
-
-    /***********************************MAIN LOOP************************************************/
-    std::unordered_set<int> U(static_cast<T &>(*this).N);
-    std::unordered_set<int> C;
-
-    int last_used_color = 1; // colors are numerated starting from 1 and are always positive
-
-    for (int i = 0; i < static_cast<T &>(*this).N; i++)U.insert(i);
-
-    for (int i = 0; i < static_cast<T &>(*this).N; i++) {
-        node vi = rand_perm.extract(*rand_perm.begin()).value();
-        node n;
-        for_each_neigh(vi,&n,[this,&n,&C](){
-            if (static_cast<T &>(*this).g[n].color != -1)
-                C.insert(static_cast<T &>(*this).g[n].color);
-        });
-        /*auto neighbours = boost::adjacent_vertices(vi, static_cast<T &>(*this).g);
-        for (auto vd: make_iterator_range(neighbours)) {
-            if (static_cast<T &>(*this).g[vd].color != -1)
-                C.insert(static_cast<T &>(*this).g[vd].color);
-        }*/
-        int c = 0;
-        bool found = false;
-        for (int i = 1; i <= last_used_color; i++) {
-            if (C.count(i) == 0) {
-                c = i;
-                found = true;
-                break;
-            }
-
+        /*************************************random permutation*************************************/
+        srand(time(nullptr));
+        std::unordered_set<int> rand_perm;
+        while (rand_perm.size() != static_cast<T &>(*this).N) {
+            int rand_vert = rand() % static_cast<T &>(*this).N;
+            rand_perm.insert(rand_vert);
         }
-        if (!found)c = last_used_color;
-        static_cast<T &>(*this).g[vi].color = c;
-        last_used_color++;
-        U.extract(vi);
-        C.clear();
-    }
+
+        /***********************************MAIN LOOP************************************************/
+        std::unordered_set<int> C;
+
+        int last_used_color = 1; // colors are numerated starting from 1 and are always positive
+
+        for (int i = 0; i < static_cast<T &>(*this).N && !exit_thread_flag; i++) {
+            node vi = rand_perm.extract(*rand_perm.begin()).value();
+            node n;
+            for_each_neigh(vi, &n, [this, &n, &C]() {
+                if (static_cast<T &>(*this).g[n].color != -1)
+                    C.insert(static_cast<T &>(*this).g[n].color);
+            });
+            /*auto neighbours = boost::adjacent_vertices(vi, static_cast<T &>(*this).g);
+            for (auto vd: make_iterator_range(neighbours)) {
+                if (static_cast<T &>(*this).g[vd].color != -1)
+                    C.insert(static_cast<T &>(*this).g[vd].color);
+            }*/
+            int c = 0;
+            bool found = false;
+            for (int i = 1; i <= last_used_color; i++) {
+                if (C.count(i) == 0) {
+                    c = i;
+                    found = true;
+                    break;
+                }
+
+            }
+            if (!found)c = last_used_color;
+            static_cast<T &>(*this).g[vi].color = c;
+            last_used_color++;
+            C.clear();
+        }
+
     return;
 }
 

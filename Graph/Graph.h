@@ -12,6 +12,8 @@
 #include <boost/graph/graph_utility.hpp>
 #include <boost/graph/iteration_macros.hpp>
 #include <boost/graph/graph_utility.hpp>
+#include <atomic>
+#include <ctime>
 #include <memory>
 #include <future>
 #include <functional>
@@ -57,6 +59,8 @@ namespace my_graph {
         int N;
         int current_vertex_no;
         int threadAvailable = std::thread::hardware_concurrency();
+        std::atomic<bool> exit_thread_flag{false};
+        std::atomic<bool> alg_finished{false};
     protected:
         void
         parallel_count_adj(list<int> &l) {
@@ -150,6 +154,10 @@ namespace my_graph {
         }
 
     public:
+        void
+        thread_function(){
+
+        }
         /*** put here algorithms ***/
         void
         sequential_algorithm();
@@ -157,27 +165,39 @@ namespace my_graph {
         parallel_sequential_algorithm();
         void
         luby();
+
         void
         startAlg(int16_t a){
-            auto start = high_resolution_clock::now();
+            cout << "Starting simulation...\n";
+            high_resolution_clock::time_point start = high_resolution_clock::now();
+            thread t1([&](){
+                std::this_thread::sleep_for(std::chrono::seconds(5));
+                if(!alg_finished)exit_thread_flag = true;
+            });
             switch (a) {
-                case 0:{
+                case 0: {
                     sequential_algorithm();
+                    alg_finished = true;
                     break;
                 }
-                case 1:{
+                case 1: {
                     break;
                 }
-                case 2:{
+                case 2: {
                     break;
                 }
                 default:
-                    break;
-
+                        break;
             }
-            auto stop = high_resolution_clock::now();
-            auto duration = duration_cast<microseconds>(stop - start);
-            cout << "Tempo di esecuzione " << duration.count()<<"micros" << endl;
+            if(exit_thread_flag){
+                cout << "Time exceded\n";
+            }
+            else{
+                high_resolution_clock::time_point end = high_resolution_clock::now();
+                auto duration = duration_cast<microseconds>(end - start);
+                cout << "Tempo di esecuzione " << duration.count() << "micros" << endl;
+            }
+            t1.join();
         }
         void
         printSol() {
