@@ -21,7 +21,7 @@ void credits(){
     std::cout << " - Paone Samuele\n";
     std::cout << " - Manca Davide\n";
     std::cout << " - Vitali Giacomo\n";
-    std::cout << "******************************************************************************************\n";
+    std::cout << "***************************************MENU************************************************\n";
 }
 void
 readFile(string& fname,vector<Pair>& edges,int& V){
@@ -75,7 +75,11 @@ run_simulation(int V,int16_t r,int16_t a,vector<Pair>& edges){
 void
 menu(){
 
-    cout << "Menu da fare \n";
+    cout << "This program solves the vertex coloring problem implementing 3 parallel algorithms:\n";
+    cout << "- Luby algorithm\n- Parallel sequential algorithm\n- TODO\n";
+    cout << "In order to have more realistic simulations, another feature of this program is that graphs are implemented whith 3 different"
+            "rappresentations: \n";
+    cout << "- Adjacent List\n- Adjacency Matrix\n- Compressed Sparse Row\n";
 }
 void
 start(string& filename,int16_t r,int16_t a){
