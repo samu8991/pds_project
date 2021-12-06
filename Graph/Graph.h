@@ -44,7 +44,7 @@ namespace my_graph {
             boost::bidirectionalS,
             vertex_descriptor> graphCSR;
 
-#ifdef _WIN32
+#if _WIN64 || _WIN32
     typedef unsigned int node;
 #else
     typedef unsigned long node;

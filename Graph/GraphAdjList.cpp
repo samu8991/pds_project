@@ -15,7 +15,7 @@ GraphAdjList::GraphAdjList (int N,vector<Pair>& edge_array){
 }
 
 void
-GraphAdjList::for_each_vertex(unsigned long node,std::function<void()> f) {
+GraphAdjList::for_each_vertex(node node,std::function<void()> f) {
     BGL_FORALL_VERTICES(curr, this->g, graphAdjMatrix) {
             node = curr;
             f();

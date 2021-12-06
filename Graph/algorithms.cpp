@@ -63,9 +63,9 @@ my_graph::Graph<T>::parallel_sequential_algorithm(){
 
     auto f = [&](int min, int max) {
         int cur_color = 1;
-        for (unsigned long i = min; i < max; ++i) {
+        for (node i = min; i < max; ++i) {
             std::unordered_set<int> c(cur_color);
-            for (unsigned long j = 1; j <= cur_color; ++j)c.insert(j);
+            for (node j = 1; j <= cur_color; ++j)c.insert(j);
             auto neighbours = boost::adjacent_vertices(i, static_cast<T &>(*this).g);
             for (auto vd: make_iterator_range(neighbours))
                 c.extract(colors[vd]);
@@ -76,7 +76,7 @@ my_graph::Graph<T>::parallel_sequential_algorithm(){
     };
     auto f1 = [&](int min, int max) {
         int cur_color = 1;
-        for (unsigned long i = min; i < max; ++i) {
+        for (node i = min; i < max; ++i) {
             auto neighbours = boost::adjacent_vertices(i, static_cast<T &>(*this).g);
             for (auto vd: make_iterator_range(neighbours))
                 if (colors[vd] == colors[i])
