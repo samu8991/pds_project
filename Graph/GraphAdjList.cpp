@@ -11,7 +11,7 @@ GraphAdjList::GraphAdjList (int N,vector<Pair>& edge_array){
             g[current_vertex].color = -1;
             g[current_vertex].isDeleted = false;
     }
-    cout << "Graph constructed:\n -Internal rappresentation >> Adjacent list \n -Number of nodes >> " << N << "\n";
+    cout << "Graph constructed:\n -Internal rappresentation >> Adjacent List \n -Number of nodes >> " << N << "\n";
 }
 
 void

@@ -15,7 +15,7 @@ GraphCSR::GraphCSR (int N,vector<Pair>& edge_array){
             g[current_vertex].color = -1;
             g[current_vertex].isDeleted = false;
     }
-    cout << "Graph constructed:\n -Internal rappresentation >> Compressed sparse row \n -Number of nodes >> " << N << "\n";
+    cout << "Graph constructed:\n -Internal rappresentation >> Compressed Sparse Row \n -Number of nodes >> " << N << "\n";
 }
 
 void

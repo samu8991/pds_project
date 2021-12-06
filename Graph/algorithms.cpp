@@ -111,7 +111,7 @@ my_graph::Graph<T>::luby(){
     std::unordered_set<unsigned long> I;
     int q = my_graph::Graph<T>::creat_prime();
     int G = static_cast<T&>(*this).current_vertex_no;
-    list<int> deg(static_cast<T&>(*this).N);
+    std::list<int> deg(static_cast<T&>(*this).N);
     while(G != 0){
         parallel_count_adj(deg);
 

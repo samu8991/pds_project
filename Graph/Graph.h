@@ -18,6 +18,7 @@
 #include <future>
 #include <functional>
 #include <thread>
+#include <list>
 
 
 using namespace std;
@@ -25,6 +26,8 @@ using namespace boost;
 using namespace std::chrono;
 
 namespace my_graph {
+    enum algo{seq,p_seq,luby};
+    enum rappr{list,matrix,csr};
     struct vertex_descriptor {
         int color;
         bool isDeleted;
@@ -63,7 +66,7 @@ namespace my_graph {
         std::atomic<bool> alg_finished{false};
     protected:
         void
-        parallel_count_adj(list<int> &l) {
+        parallel_count_adj(std::list<int> &l) {
 
             auto f = [&](int min, int max) {
                 auto it = l.begin();
@@ -89,7 +92,7 @@ namespace my_graph {
         }
 
         void
-        second_phase_luby(std::unordered_set<node>& I,list<int> d,int q){
+        second_phase_luby(std::unordered_set<node>& I,std::list<int> d,int q){
             node i = 0;
             for(auto it = d.begin(); it != d.end(); ++it){
                 if(*it == 0){
@@ -108,7 +111,7 @@ namespace my_graph {
                     std::unordered_set<int> X;
                     int y = rand()%(q-1);
                     int x = rand()%(q-1)+1;
-                    list<std::thread> threads(static_cast<T&>(*this).threadAvailable);
+                    std::list<std::thread> threads(static_cast<T&>(*this).threadAvailable);
                     auto f = [&](){
                         //TODO
                         vector<Pair> ret;
@@ -177,24 +180,24 @@ namespace my_graph {
                 else;
             });
             switch (a) {
-                case 0: {
+                case seq : {
+                    cout << "Algorithm used is : sequential" << "\n";
                     sequential_algorithm();
                     break;
                 }
-                case 1: {
+                case p_seq: {
+                    cout << "Algorithm used is : parallel sequential"<< "\n";
                     break;
                 }
-                case 2: {
+                case algo::luby: {
+                    cout << "Algorithm used is : luby"<< "\n";
                     break;
                 }
                 default:
                         break;
             }
             alg_finished = true;
-            if(exit_thread_flag){
-                cout << "Time exceded\n";
-
-            }
+            if(exit_thread_flag)throw "Time exceded\n";
             else{
                 high_resolution_clock::time_point end = high_resolution_clock::now();
                 auto duration = duration_cast<microseconds>(end - start);

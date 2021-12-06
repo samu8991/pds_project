@@ -23,8 +23,6 @@ void credits(){
 }
 void
 readFile(string& fname,vector<Pair>& edges,int& V){
-    string base ="/home/voidjocker/CLionProjects/pds_project/benchmarks/";
-    fname = base+fname;
     string line;int E;
     string buffer;
     stringstream lineStream;
@@ -72,6 +70,24 @@ run_simulation(int V,int16_t r,int16_t a,vector<Pair>& edges){
     }
 }
 void
+automatic_simulation(int V,vector<Pair>& edges){
+    cout << "Automatic testing procedure entered\n";
+    cout << "Every graph will be tested 9 times one time for each rappresentation and algorithm\n ";
+    std::string constructed_path_str_dbg = "/home/voidjocker/CLionProjects/pds_project/benchmarks/";
+    std::string ext(".graph");int i = 0;
+    for (auto& p : filesystem::recursive_directory_iterator(constructed_path_str_dbg)) {
+        cout << "Starting simulation number " << i << " on file " << p<<"\n";
+        string s = p.path().generic_string();
+        readFile(s, edges, V);
+        for (int16_t a = 0; a < 3; ++a) {
+            for (int16_t r = 0; r < 3; ++r) {
+                run_simulation(V, r, a, edges);
+            }
+        }
+        i++;
+    }
+}
+void
 menu(){
 
     cout << "This program solves the vertex coloring problem implementing 3 parallel algorithms:\n";
@@ -90,22 +106,29 @@ show_benchmarks(){
         if (p.path().extension() == ext)
             std::cout << p << '\n';
     }
+
 }
 void
 start(){
     vector<Pair> edges;int V;
-    string fileName;int16_t r,a;
+    string fileName,automatic;int16_t r,a;
     credits();
     menu();
     show_benchmarks();
-    cout << "Choose the graph you want to use for this test >> ";
-    cin >> fileName;
-    cout << "Choose the rappresentation >> ";
-    cin >> r;
-    cout << "Choose the algorithm >> ";
-    cin >> a;
-    readFile(fileName,edges,V);
-    run_simulation(V,r,a,edges);
+    cout<< "Do you want an automatic procedure of testing or do you want to choose by yourself? (y/n)";
+    cin>>automatic;
+    if(automatic == "y")
+        automatic_simulation(V,edges);
+    else {
+        cout << "Choose the graph you want to use for this test >> ";
+        cin >> fileName;
+        cout << "Choose the rappresentation >> ";
+        cin >> r;
+        cout << "Choose the algorithm >> ";
+        cin >> a;
+        readFile(fileName, edges, V);
+        run_simulation(V, r, a, edges);
+    }
 }
 #endif
 
