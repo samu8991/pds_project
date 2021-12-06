@@ -2,7 +2,7 @@
 #include <fstream>
 #include <string>
 #include "Graph/Graph.h"
-#include <filesystem>
+#include <boost/filesystem.hpp>
 #define MAIN
 
 using namespace std;
@@ -73,9 +73,9 @@ void
 automatic_simulation(int V,vector<Pair>& edges){
     cout << "Automatic testing procedure entered\n";
     cout << "Every graph will be tested 9 times one time for each rappresentation and algorithm\n ";
-    std::string constructed_path_str_dbg = "/home/voidjocker/CLionProjects/pds_project/benchmarks/";
+    std::string constructed_path_str_dbg = "C:\\Users\\giogi\\OneDrive\\Desktop\\benchmarks\\base\\";        //"/home/voidjocker/CLionProjects/pds_project/benchmarks/";
     std::string ext(".graph");int i = 0;
-    for (auto& p : filesystem::recursive_directory_iterator(constructed_path_str_dbg)) {
+    for (auto& p : boost::filesystem::recursive_directory_iterator(constructed_path_str_dbg)) {
         cout << "Starting simulation number " << i << " on file " << p<<"\n";
         string s = p.path().generic_string();
         readFile(s, edges, V);
@@ -99,9 +99,9 @@ menu(){
 void
 show_benchmarks(){
     cout<< "This is the list of benchmarks used to test these algorithms...\n";
-    std::string constructed_path_str_dbg = "/home/voidjocker/CLionProjects/pds_project/benchmarks/";
+    std::string constructed_path_str_dbg = "C:\\Users\\giogi\\OneDrive\\Desktop\\benchmarks\\base\\";   // "/home/voidjocker/CLionProjects/pds_project/benchmarks/";
     std::string ext(".graph");
-    for (auto& p : filesystem::recursive_directory_iterator(constructed_path_str_dbg))
+    for (auto& p : boost::filesystem::recursive_directory_iterator(constructed_path_str_dbg))
     {
         if (p.path().extension() == ext)
             std::cout << p << '\n';
