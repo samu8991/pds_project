@@ -1,22 +1,21 @@
 #include <iostream>
-#include <fstream>
 #include <string>
-#include "Graph/Graph.h"
-#include <boost/filesystem.hpp>
 #include <cstdlib>
+#include <boost/filesystem.hpp>
+#include "Graph/Graph.h"
 
 
 using namespace std;
 using namespace my_graph;
 
-void credits(void);
+void credits();
 std::string getEnv( const std::string & var );
 void readFile(string&,vector<Pair>&,int&);
 void run_simulation(int,int16_t,int16_t,vector<Pair>&);
 void automatic_simulation(int,vector<Pair>&);
-void menu(void);
-void show_benchmarks(void);
-void start(void);
+void menu();
+void show_benchmarks();
+void start();
 
 int 
 main(){
@@ -74,7 +73,7 @@ void
 credits(){
     std::cout << "**************************************CREDITS*********************************************\n";
     std::cout << "Vertex Coloring Project" << '\n';
-    std::cout << "Politenico di Torino 2020/2021\n";
+    std::cout << "Politecnico di Torino 2020/2021\n";
     std::cout << "Professors:\n";
     std::cout << " - Alessandro Savino\n";
     std::cout << " - Stefano Quer\n";
@@ -187,12 +186,12 @@ show_benchmarks(){
 }
 void
 start(){
-    vector<Pair> edges;int V;
+    vector<Pair> edges;int V=0;
     string fileName,automatic;int16_t r,a;
     credits();
     menu();
     show_benchmarks();
-    cout<< "Do you want an automatic procedure of testing or do you want to choose by yourself? (y/n)";
+    cout<< "Do you want an automatic testing procedure? (y/n)";
     cin>>automatic;
     if(automatic == "y")
         automatic_simulation(V,edges);

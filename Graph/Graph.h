@@ -108,29 +108,36 @@ namespace my_graph {
                     });
                 }
                 else{
-                    std::unordered_set<int> X;
+                    std::vector<int> X;
                     int y = rand()%(q-1);
                     int x = rand()%(q-1)+1;
                     std::list<std::thread> threads(static_cast<T&>(*this).threadAvailable);
-                    auto f = [&](){
-                        //TODO
-                        vector<Pair> ret;
-                        return ret;
+
+                    auto f = [&](int start,int end){
+                        auto it = X.begin()+start;
+                        for(int i = start; i < end; ++i){
+                            int n_i = q / (2* degree(i));
+                            int l_i = (x+y*i)%q;
+                            if(l_i < n_i)X[*it] = i;
+                        }
                     };
-                    for (int j= 0; j < static_cast<T&>(*this).threadAvailable; i++)
-                        threads.emplace_back(f);
+                    int step = static_cast<T&>(*this).N/static_cast<T&>(*this).threadAvailable;
+                    int i = 0;
+                    for (int j= 0; j < static_cast<T&>(*this).threadAvailable; j++) {
+                        threads.emplace_back(f,i,i+step);
+                        i+=step;
+                    }
                     for(auto& t:threads)t.join();
-                    std::unordered_set<int> I_p(X);
+                    std::vector<int> I_p(X);
                     auto f1 = [&](){
-                        //TODO
                         vector<std::pair<int,int>> ret;
                         return ret;
                     };
                     std::copy(std::begin(I_p),std::end(I_p),std::inserter(I,std::end(I)));
                     std::unordered_set<node> N;
-                    node* n;
-                    for_each_neigh(i,n,[&](){
-                       N.insert(*n);
+                    node* nod;
+                    for_each_neigh(i,nod,[&](){
+                       N.insert(*nod);
                     });
                     i++;
                     std::copy(std::begin(N),std::end(N),std::inserter(I_p,std::end(I_p)));
