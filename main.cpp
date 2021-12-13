@@ -105,30 +105,31 @@ readFile(string& fname,vector<Pair>& edges,int& V){
 
     int neighbour;
     edges.reserve(E); //riservo E posti,
-
+    cout << "Reading file... \n";
     for(int i=0; i<V; i++){
         getline(fin, line);
         lineStream = stringstream(line);
         while(lineStream >> neighbour)
             edges.emplace_back(Pair(i,neighbour-1));
     }
+    cout << "File read\n";
     fin.close();
 }
 void
-run_simulation(int V,int16_t r,int16_t a,vector<Pair>& edges){
+run_simulation(int V,int16_t r,int16_t a,vector<Pair>& edges, int8_t nothreads){
     switch (r) {
         case 0:{
-            GraphAdjList g(V,edges);
+            GraphAdjList g(V,nothreads,edges);
             g.startAlg(a);
             break;
         }
         case 1:{
-            GraphAdjMatrix g(V,edges);
+            GraphAdjMatrix g(V,nothreads,edges);
             g.startAlg(a);
             break;
         }
         case 2:{
-            GraphCSR g(V, edges);
+            GraphCSR g(V,nothreads,edges);
             g.startAlg(a);
             break;
         }
@@ -138,7 +139,7 @@ run_simulation(int V,int16_t r,int16_t a,vector<Pair>& edges){
     }
 }
 void
-automatic_simulation(int V,vector<Pair>& edges){
+automatic_simulation(int V,vector<Pair>& edges,int8_t nothreads){
     cout << "Automatic testing procedure entered\n";
     cout << "Every graph will be tested 9 times one time for each rappresentation and algorithm\n ";
 #if _WIN64 || _WIN32
@@ -153,7 +154,7 @@ automatic_simulation(int V,vector<Pair>& edges){
         readFile(s, edges, V);
         for (int16_t a = 0; a < 3; ++a) {
             for (int16_t r = 0; r < 3; ++r) {
-                run_simulation(V, r, a, edges);
+                run_simulation(V, r, a, edges,nothreads);
             }
         }
         i++;
@@ -163,22 +164,21 @@ void
 menu(){
 
     cout << "This program solves the vertex coloring problem implementing 3 parallel algorithms:\n";
-    cout << "- Luby algorithm\n- Parallel sequential algorithm\n- TODO\n";
+    cout << "- Luby algorithm\n- Parallel sequential algorithm\n- Jones_plassmann\n";
     cout << "In order to have more realistic simulations, another feature of this program is that graphs are implemented whith 3 different"
             "rappresentations: \n";
     cout << "- Adjacent List\n- Adjacency Matrix\n- Compressed Sparse Row\n";
 }
 void
 show_benchmarks(){
-    cout<< "This is the list of benchmarks used to test these algorithms...\n";
+    cout<< "This is the list of benchmark used to test these algorithms...\n";
 #if _WIN64 || _WIN32
     std::string constructed_path_str_dbg = "C:\\benchmarks\\";
 #else
     std::string constructed_path_str_dbg = getEnv("HOME")+"/benchmarks/";
 #endif
     std::string ext(".graph");
-    for (auto& p : boost::filesystem::recursive_directory_iterator(constructed_path_str_dbg))
-    {
+    for (auto& p : boost::filesystem::recursive_directory_iterator(constructed_path_str_dbg)){
         if (p.path().extension() == ext)
             std::cout << p << '\n';
     }
@@ -188,13 +188,16 @@ void
 start(){
     vector<Pair> edges;int V=0;
     string fileName,automatic;int16_t r,a;
+    int8_t nothreads;
     credits();
     menu();
     show_benchmarks();
     cout<< "Do you want an automatic testing procedure? (y/n)";
     cin>>automatic;
+    cout << "Choose thread's number(1,2,4,8 or hardware based(0))";
+    cin>>nothreads;
     if(automatic == "y")
-        automatic_simulation(V,edges);
+        automatic_simulation(V,edges,nothreads);
     else {
         cout << "Choose the graph you want to use for this test >> ";
         cin >> fileName;
@@ -203,6 +206,6 @@ start(){
         cout << "Choose the algorithm >> ";
         cin >> a;
         readFile(fileName, edges, V);
-        run_simulation(V, r, a, edges);
+        run_simulation(V, r, a, edges,nothreads);
     }
 }

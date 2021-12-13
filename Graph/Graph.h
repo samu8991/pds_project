@@ -62,7 +62,7 @@ namespace my_graph {
     protected:
         int N;
         int current_vertex_no;
-        int threadAvailable = std::thread::hardware_concurrency();
+        int threadAvailable;
         std::atomic<bool> exit_thread_flag{false};
         std::atomic<bool> alg_finished{false};
     protected:
@@ -149,6 +149,7 @@ namespace my_graph {
 
             }
         }
+
         int
         creat_prime() {
             int q = 0;
@@ -169,12 +170,15 @@ namespace my_graph {
         /*** put here algorithms ***/
         void
         sequential_algorithm();
+
         void
         parallel_sequential_algorithm();
+
         void
         luby();
 
-        void jones_plassmann();
+        void
+        jones_plassmann();
 
         void
         startAlg(int16_t a){
@@ -198,10 +202,12 @@ namespace my_graph {
                 }
                 case p_seq: {
                     cout << "Algorithm used is : parallel sequential"<< "\n";
+                    parallel_sequential_algorithm();
                     break;
                 }
                 case algo::luby: {
                     cout << "Algorithm used is : Luby"<< "\n";
+                    luby();
                     break;
                 }
                 case jp: {
@@ -223,6 +229,7 @@ namespace my_graph {
             }
             t1.join();
         }
+
         void
         printSol() {
             for (node i = 0; i < static_cast<T &>(*this).N; ++i)
@@ -233,6 +240,7 @@ namespace my_graph {
         printGraph() {
             boost::print_graph(static_cast<T &>(*this).g);
         }
+
         int
         degree(node node){
             return static_cast<T &>(*this).degree(node);
@@ -252,6 +260,7 @@ namespace my_graph {
         for_each_edge(std::function<void()> f){
             return static_cast<T &>(*this).for_each_edge(f);
         }
+
     };
 
     class GraphCSR :
@@ -262,7 +271,7 @@ namespace my_graph {
         int N;
     public:
 
-        GraphCSR(int N, vector<Pair> &edge_array);
+        GraphCSR(int N, int8_t nothreads,vector<Pair> &edge_array);
 
         void
         for_each_vertex(node node, std::function<void()> f);
@@ -285,7 +294,7 @@ namespace my_graph {
         graphAdjList g;
     public:
 
-        GraphAdjList(int N, vector<Pair> &edge_array);
+        GraphAdjList(int N, int8_t nothreads, vector<Pair> &edge_array);
 
         void
         for_each_vertex(node node, std::function<void()> f);
@@ -307,7 +316,7 @@ namespace my_graph {
         graphAdjMatrix g = graphAdjMatrix(0);
     public:
 
-        GraphAdjMatrix(int N, vector<Pair> &edge_array);
+        GraphAdjMatrix(int N, int8_t nothreads, vector<Pair> &edge_array);
 
         void
         for_each_vertex(node node, std::function<void()> f);

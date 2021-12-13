@@ -3,9 +3,12 @@
 //
 #include "Graph.h"
 using namespace my_graph;
-GraphAdjList::GraphAdjList (int N,vector<Pair>& edge_array){
+GraphAdjList::GraphAdjList (int N, int8_t nothreads,vector<Pair>& edge_array){
     this->N = N;
+    this->threadAvailable = nothreads;
+    if(nothreads == 0)this->threadAvailable = std::thread::hardware_concurrency();
     this->current_vertex_no = N;
+    cout << "Starting graph construction...\n";
     g = graphAdjList(edge_array.begin(),edge_array.end(),N);
     BGL_FORALL_VERTICES(current_vertex, g, graphAdjList) {
             g[current_vertex].color = -1;
