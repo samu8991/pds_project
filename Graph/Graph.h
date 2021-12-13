@@ -26,11 +26,12 @@ using namespace boost;
 using namespace std::chrono;
 
 namespace my_graph {
-    enum algo{seq,p_seq,luby};
+    enum algo{seq,p_seq,luby,jp};
     enum rappr{list,matrix,csr};
     struct vertex_descriptor {
         int color;
         bool isDeleted;
+        int weight;
     };
 
     typedef boost::adjacency_list<boost::listS,
@@ -163,6 +164,7 @@ namespace my_graph {
             return q;
         }
 
+
     public:
         /*** put here algorithms ***/
         void
@@ -171,6 +173,8 @@ namespace my_graph {
         parallel_sequential_algorithm();
         void
         luby();
+
+        void jones_plassmann();
 
         void
         startAlg(int16_t a){
@@ -197,7 +201,12 @@ namespace my_graph {
                     break;
                 }
                 case algo::luby: {
-                    cout << "Algorithm used is : luby"<< "\n";
+                    cout << "Algorithm used is : Luby"<< "\n";
+                    break;
+                }
+                case jp: {
+                    cout << "Algorithm used is : Jones-Plassmann"<< "\n";
+                    jones_plassmann();
                     break;
                 }
                 default:

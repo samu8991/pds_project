@@ -14,6 +14,7 @@ GraphCSR::GraphCSR (int N,vector<Pair>& edge_array){
     BGL_FORALL_VERTICES(current_vertex, g, graphCSR) {
             g[current_vertex].color = -1;
             g[current_vertex].isDeleted = false;
+            g[current_vertex].weight = rand() % 100 + 1;
     }
     cout << "Graph constructed:\n -Internal rappresentation >> Compressed Sparse Row \n -Number of nodes >> " << N << "\n";
 }

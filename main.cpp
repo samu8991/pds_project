@@ -86,8 +86,8 @@ credits(){
 void
 readFile(string& fname,vector<Pair>& edges,int& V){
     string line;int E;
-#ifdef _WIN32
-    string base = "C:\\";
+#if _WIN64 || _WIN32
+    string base = "C:\\benchmarks\\";
 #else
     string base = getEnv("HOME")+"/benchmarks/";
 #endif
@@ -141,8 +141,8 @@ void
 automatic_simulation(int V,vector<Pair>& edges){
     cout << "Automatic testing procedure entered\n";
     cout << "Every graph will be tested 9 times one time for each rappresentation and algorithm\n ";
-#ifdef _WIN32
-    std::string constructed_path_str_dbg="C:\\";
+#if _WIN64 || _WIN32
+    std::string constructed_path_str_dbg="C:\\benchmarks\\";
 #else
     std::string constructed_path_str_dbg = getEnv("HOME")+"/benchmarks/";
 #endif
@@ -171,8 +171,8 @@ menu(){
 void
 show_benchmarks(){
     cout<< "This is the list of benchmarks used to test these algorithms...\n";
-#ifdef _WIN32
-    std::string constructed_path_str_dbg = "C:\\";
+#if _WIN64 || _WIN32
+    std::string constructed_path_str_dbg = "C:\\benchmarks\\";
 #else
     std::string constructed_path_str_dbg = getEnv("HOME")+"/benchmarks/";
 #endif
