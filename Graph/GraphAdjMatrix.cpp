@@ -40,14 +40,10 @@ GraphAdjMatrix::degree(node node){
 }
 
 void
-GraphAdjMatrix::for_each_edge(std::function<void()> f) {
-     typedef boost::adjacency_matrix<boost::undirectedS,
-             vertex_descriptor>::edge_iterator edge_iter;
-
-     std::pair<edge_iter, edge_iter> ep;
-     edge_iter ei, ei_end;
-     int i = 0;
-     for (tie(ei, ei_end) = edges(g); ei != ei_end; ++ei)
-         f();
-
+GraphAdjMatrix::for_each_edge(Pair* current_edge,std::function<void()> f) {
+    BGL_FORALL_EDGES(current, this->g, graphAdjMatrix){
+            current_edge->first = source(current,g);
+            current_edge->second = target(current,g);
+            f();
+        }
 }

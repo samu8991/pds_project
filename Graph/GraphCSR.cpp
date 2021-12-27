@@ -36,33 +36,14 @@ GraphCSR::for_each_neigh(node current_vertex, node* neighbor, std::function<void
             f();
         }
 }
-/*
+
 void
-GraphCSR::for_each_vertex(node node,std::function<void()> f) {
-    BGL_FORALL_VERTICES(curr, g, graphCSR) {
-            node = curr;
-            f();
-        }
-}*/
-/*
-void
-GraphCSR::for_each_neigh(node current_vertex,node n,std::function<void()> f){
-    using AdjacencyIterator = boost::detail::adj_list_gen<adjacency_list<
-            vecS, vecS, undirectedS, vertex_descriptor>,
-                vecS, vecS, undirectedS, vertex_descriptor, no_property, no_property, listS>
-                    ::config::adjacency_iterator;
-    AdjacencyIterator neighbor{};
-    AdjacencyIterator end{};
-    for(auto[neighbor,end] = boost::adjacent_vertices(current_vertex,this->g);
-        neighbor != end; ++neighbor){
-        n = *neighbor;
+GraphCSR::for_each_edge(Pair* current_edge,std::function<void()> f) {
+    BGL_FORALL_EDGES(current, this->g, graphCSR){
+        current_edge->first = source(current,g);
+        current_edge->second = target(current,g);
         f();
     }
-}*/
-
-void
-GraphCSR::for_each_edge(std::function<void()> f) {
-
 }
 
 int

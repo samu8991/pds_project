@@ -77,7 +77,7 @@ namespace my_graph {
                         int count = 0;
                         if(!static_cast<T&>(*this).g[curr].isDeleted){
                             node n;
-                            for_each_neigh(curr,&n,[&count,this,n](){
+                            for_each_neigh(curr,&n,[&count,this,&n](){
                                 if(!static_cast<T&>(*this).g[n].isDeleted)
                                     count++;
                             });
@@ -107,6 +107,7 @@ namespace my_graph {
                     cout << "Thread " << j << " >> " << start << " , " << end << endl;
 
                     for(int i = start; i < end; ++i){
+                        cout << "Thread " << j << " d[i]= " << d[i] << endl;
                         if (d[i] == 0 && !static_cast<T &>(*this).g[i].isDeleted) {
                             I.insert(i);
                             static_cast<T &>(*this).current_vertex_no--;
@@ -127,7 +128,7 @@ namespace my_graph {
                                 assert(static_cast<T &>(*this).current_vertex_no >= 0);
                                 cout << "Current vertex number 2 " << static_cast<T &>(*this).current_vertex_no << endl;
                             });
-                        }else if(d[i] < 16 && !static_cast<T &>(*this).g[i].isDeleted){
+                        }else if(d[i] < n/16 && !static_cast<T &>(*this).g[i].isDeleted){
                             assert(d[i] != 0);
                             std::unordered_set<node> X;
                             int y = rand()%(q-1);
@@ -139,23 +140,23 @@ namespace my_graph {
 
                             std::unordered_set<node>I_p(X);
                             auto f1 = [this,&I_p,&d](int start,int end){
-                                node n1,n2;
-                                std::function<void()> my_f = [&](){
-                                    if (!static_cast<T &>(*this).g[n1].isDeleted && !static_cast<T &>(*this).g[n2].isDeleted
-                                        && n1 >= start
-                                        && n1 <= end
-                                        && n2 >= start
-                                        && n2 <= end){
-                                        if (d[n1]<= d[n2]) {
-                                            auto it = std::find(I_p.begin(), I_p.end(), n1);
-                                            I_p.erase(it);
+                                Pair current_edge;
+                                std::function<void()> my_f = [this,&I_p,start,end,&d,&current_edge](){
+                                    if (!static_cast<T &>(*this).g[current_edge.first].isDeleted && !static_cast<T &>(*this).g[current_edge.second].isDeleted
+                                        && current_edge.first >= start
+                                        && current_edge.first<= end
+                                        && current_edge.second >= start
+                                        && current_edge.second<= end){
+                                        if (d[current_edge.first]<= d[current_edge.second]) {
+                                            //auto it = std::find(I_p.begin(), I_p.end(), current_edge.first);
+                                            I_p.erase(current_edge.first);
                                         } else {
-                                            auto it = std::find(I_p.begin(), I_p.end(), n2);
-                                            I_p.erase(it);
+                                            //auto it = std::find(I_p.begin(), I_p.end(), current_edge.second);
+                                            I_p.erase(current_edge.second);
                                         }
                                     }
                                 };
-                                static_cast<T&>(*this).for_each_edge(my_f);
+                                static_cast<T&>(*this).for_each_edge(&current_edge,my_f);
                             };
                             std::vector<std::thread> otherthreads(static_cast<T&>(*this).threadAvailable);
                             int k = 0;
@@ -306,8 +307,8 @@ namespace my_graph {
         };
 
         void
-        for_each_edge(std::function<void()> f){
-            return static_cast<T &>(*this).for_each_edge(f);
+        for_each_edge(Pair *current_edge,std::function<void()> f){
+            return static_cast<T &>(*this).for_each_edge(current_edge,f);
         }
 
     };
@@ -332,7 +333,7 @@ namespace my_graph {
         degree(node node);
 
         void
-        for_each_edge(std::function<void()> f);
+        for_each_edge(Pair *current_edge,std::function<void()> f);
     };
 
 
@@ -352,7 +353,7 @@ namespace my_graph {
         for_each_neigh(node v, node* neighbor, std::function<void()> f);
 
         void
-        for_each_edge(std::function<void()> f);
+        for_each_edge(Pair* current_edge,std::function<void()> f);
 
         int
         degree(node node);
@@ -374,7 +375,7 @@ namespace my_graph {
         for_each_neigh(node v, node* neighbor, std::function<void()> f);
 
         void
-        for_each_edge(std::function<void()> f);
+        for_each_edge(Pair* current_edge,std::function<void()> f);
 
         int
         degree(node node);

@@ -39,9 +39,10 @@ GraphAdjList::degree(node node){
 }
 
 void
-GraphAdjList::for_each_edge(std::function<void()> f) {
-    auto es = boost::edges(g);
-    for (auto eit = es.first; eit != es.second; ++eit) {
-        f();
-    }
+GraphAdjList::for_each_edge(Pair* current_edge,std::function<void()> f) {
+    BGL_FORALL_EDGES(current, this->g, graphAdjList){
+            current_edge->first = source(current,g);
+            current_edge->second = target(current,g);
+            f();
+        }
 }
