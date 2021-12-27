@@ -2,6 +2,7 @@
 // Created by voidjocker on 30/11/21.
 //
 #include "Graph.h"
+#include <assert.h>
 using namespace std;
 
 template<typename T>
@@ -108,20 +109,42 @@ my_graph::Graph<T>::parallel_sequential_algorithm(){
 
 template<typename T>
 void
-my_graph::Graph<T>::luby(){
-    std::unordered_set<unsigned long> I;
+my_graph::Graph<T>::luby() {
+    std::unordered_set<node> I;
     int q = my_graph::Graph<T>::creat_prime();
-    int G = static_cast<T&>(*this).current_vertex_no;
-    std::list<int> deg(static_cast<T&>(*this).N);
-    while(G != 0){
+    int current_color = 0;
+    int current_colored = 0;
+    std::vector<int> deg(static_cast<T &>(*this).N);
+label:
+    while (static_cast<T &>(*this).current_vertex_no != 0) {
         parallel_count_adj(deg);
-
+        second_phase_luby(I, deg, q);
+        cout << "Current vertex number>> " << static_cast<T &>(*this).current_vertex_no << endl;
     }
+    assert(static_cast<T &>(*this).current_vertex_no == 0);
+    for (auto node: I) {
+        static_cast<T &>(*this).g[node].color = current_color;
+        current_colored++;
+    }
+    current_color++;
+    if (current_colored != static_cast<T &>(*this).N) {
+        node n;
+        I.clear();
+        for_each_vertex(&n, [this,n]() {
+            if (static_cast<T &>(*this).g[n].color == -1) {
+                static_cast<T &>(*this).g[n].isDeleted = false;
+                static_cast<T &>(*this).current_vertex_no++;
+            }
+        });
+        goto label;
+    }
+    assert(current_colored == static_cast<T &>(*this).N);
+    printSol();
 }
 
 template<typename T>
 void my_graph::Graph<T>::jones_plassmann() {
-    // U := V    but in this case I interested only on the size, so I save the number of vertices N
+    // U := V    but in this case I'm interested only in the size, so I save the number of vertices N
     auto U = static_cast<T &>(*this).N;
     node neigh;
 

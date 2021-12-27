@@ -3,7 +3,7 @@
 //
 #include "Graph.h"
 using namespace my_graph;
-GraphAdjList::GraphAdjList (int N, int8_t nothreads,vector<Pair>& edge_array){
+GraphAdjList::GraphAdjList (int N, int nothreads,vector<Pair>& edge_array){
     this->N = N;
     this->threadAvailable = nothreads;
     if(nothreads == 0)this->threadAvailable = std::thread::hardware_concurrency();
@@ -19,24 +19,18 @@ GraphAdjList::GraphAdjList (int N, int8_t nothreads,vector<Pair>& edge_array){
 }
 
 void
-GraphAdjList::for_each_vertex(node node,std::function<void()> f) {
-    BGL_FORALL_VERTICES(curr, this->g, graphAdjMatrix) {
-            node = curr;
+GraphAdjList::for_each_vertex(node* current_vertex, std::function<void()> f){
+    BGL_FORALL_VERTICES(curr, g, graphAdjList){
+            *current_vertex = curr;
             f();
         }
 }
 void
-GraphAdjList::for_each_neigh(node current_vertex,node* n,std::function<void()> f){
-    using AdjacencyIterator = boost::detail::adj_list_gen<adjacency_list<vecS,vecS, undirectedS, vertex_descriptor>,
-                                                                    vecS, vecS, undirectedS, vertex_descriptor, no_property,
-                                                                    no_property, listS>::config::adjacency_iterator;
-    AdjacencyIterator neighbor{};
-    AdjacencyIterator end{};
-    for(auto[neighbor,end] = boost::adjacent_vertices(current_vertex,this->g);
-        neighbor != end; ++neighbor){
-        *n = *neighbor;
-        f();
-    }
+GraphAdjList::for_each_neigh(node current_vertex, node* neighbor, std::function<void()> f){
+    BGL_FORALL_ADJ(current_vertex, neigh, g, graphAdjList){
+            *neighbor = neigh;
+            f();
+        }
 }
 
 int
@@ -46,5 +40,8 @@ GraphAdjList::degree(node node){
 
 void
 GraphAdjList::for_each_edge(std::function<void()> f) {
-
+    auto es = boost::edges(g);
+    for (auto eit = es.first; eit != es.second; ++eit) {
+        f();
+    }
 }

@@ -16,11 +16,22 @@ void automatic_simulation(int,vector<Pair>&);
 void menu();
 void show_benchmarks();
 void start();
-
+#define PROVA
 int 
 main(){
-
-    start();
+#ifdef PROVA
+      vector<Pair> edge_array = { Pair(0,1), Pair(0,2), Pair(0,3),Pair(0,4),Pair(0,5),
+                                  Pair(1,0),Pair(1,3),Pair(1,4),Pair(1,5),Pair(1,6),Pair(1,7),
+                                  Pair(2,0),
+                                  Pair(3,0),Pair(3,1), Pair(3,4),Pair(3,5),Pair(3,7),
+                                  Pair(4,0),Pair(4,1),Pair(4,3),Pair(4,6),
+                                  Pair(5,0),Pair(5,1),Pair(5,3),Pair(5,6),Pair(5,7),
+                                  Pair(6,5),Pair(6,1),Pair(6,4),
+                                  Pair(7,5),Pair(7,3),Pair(7,1)};
+      GraphCSR g(8,2,edge_array);
+      g.luby();
+#endif
+    //start();
     return EXIT_SUCCESS;
 
 
@@ -188,7 +199,7 @@ void
 start(){
     vector<Pair> edges;int V=0;
     string fileName,automatic;int16_t r,a;
-    int8_t nothreads;
+    int nothreads;
     credits();
     menu();
     show_benchmarks();
