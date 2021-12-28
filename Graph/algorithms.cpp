@@ -2,7 +2,7 @@
 // Created by voidjocker on 30/11/21.
 //
 #include "Graph.h"
-#include <assert.h>
+#include <cassert>
 using namespace std;
 
 template<typename T>
@@ -36,9 +36,9 @@ my_graph::Graph<T>::sequential_algorithm() {
             }*/
             int c = 0;
             bool found = false;
-            for (int i = 1; i <= last_used_color; i++) {
-                if (C.count(i) == 0) {
-                    c = i;
+            for (int j = 1; j <= last_used_color; j++) {
+                if (C.count(j) == 0) {
+                    c = j;
                     found = true;
                     break;
                 }
@@ -107,7 +107,7 @@ my_graph::Graph<T>::parallel_sequential_algorithm(){
     return;
 }
 
-template<typename T>
+/*template<typename T>
 void
 my_graph::Graph<T>::luby() {
     std::unordered_set<node> I;
@@ -141,7 +141,97 @@ label:
     assert(current_colored == static_cast<T &>(*this).N);
     printSol();
 }
+*/
+template<typename T>
+void
+my_graph::Graph<T>::luby()
+{
+    std::unordered_set<node> I;
+    int current_color = 0;
+    int BigC = static_cast<T&>(*this).N;
+    std::vector<std::thread> threads(static_cast<T&>(*this).threadAvailable);
+    int step = static_cast<T&>(*this).N/static_cast<T&>(*this).threadAvailable;step--;
+    int k = 0;
+    function<void(int,int)> core = [this,&I](int start, int end){
+        int cvn = static_cast<T&>(*this).N/static_cast<T&>(*this).threadAvailable;
+        while( cvn != 0) {
+            cout << "Thread "  << start << " - " << end << endl;
+            cout << "CVN " << cvn << endl;
 
+            std::unordered_set<node> S;
+            generate_random_distr(S, start, end);
+            assert(S.size() > 0);
+            Pair e;
+            for_each_edge(&e, [&]() {
+                if (S.find(e.first) != S.end() && S.find(e.second) != S.end()) {
+                    if (static_cast<T &>(*this).degree(e.first) < static_cast<T &>(*this).degree(e.second))
+                        S.erase(e.first);
+                    else
+                        S.erase(e.second);
+                }
+            });
+            for(auto it = S.begin(); it != S.end(); ++it){
+                std::unique_lock<mutex> uniqueLock(m);
+                I.insert(*it);
+                static_cast<T&>(*this).g[*it].isDeleted = true;
+                cvn--;
+                cout << "CVN1 " << cvn << endl;
+                pause();
+                node nei;
+                for_each_neigh(*it,&nei,[this,&nei,&cvn,end,start]() {
+                    if (!static_cast<T &>(*this).g[nei].isDeleted && nei <= end && nei >= start){
+                        static_cast<T &>(*this).g[nei].isDeleted = true;
+                        cvn--;
+                        cout << "CVN2 " << cvn << endl;
+                    }
+                });
+
+            }
+
+            assert(cvn >= 0);
+        }
+    };
+    while(BigC != 0){
+        cout << "Entrato " << endl;
+        k = 0;
+        for (int j= 0; j < static_cast<T&>(*this).threadAvailable; ++j) {
+            threads.emplace_back(core,k,k+step);
+            k+=(step+1);
+        }
+        for(auto& t:threads){
+            if(t.joinable())
+                t.join();
+        }
+        threads.clear();
+        assert(([this]()->bool{
+            node curr;
+            bool ret = true;
+            for_each_vertex(&curr,[this,&curr,&ret]()->void{
+               if(!static_cast<T&>(*this).g[curr].isDeleted){
+                   ret= false;
+                   return;
+               }
+            });
+            return ret;
+        })());
+
+        // Coloring nodes in I
+        for(node node: I){
+            static_cast<T&>(*this).g[node].color = current_color;
+        }
+        current_color++;
+        node curr;
+        for_each_vertex(&curr,[this,&curr,&BigC]{
+           if(static_cast<T&>(*this).g[curr].color == -1){
+               static_cast<T&>(*this).g[curr].isDeleted = false;
+               BigC--;
+           }//non trovato
+        });
+
+        I.clear();
+    }
+    printSol();
+}
 template<typename T>
 void my_graph::Graph<T>::jones_plassmann() {
     // U := V    but in this case I'm interested only in the size, so I save the number of vertices N
@@ -153,7 +243,7 @@ void my_graph::Graph<T>::jones_plassmann() {
     node sizeOfI[4];
 
 
-    auto f = [&](int min, int max, int i) {
+    auto f = [this,&neigh,&sizeOfI](int min, int max, int i) {
 
         // I := { v such that w(v)>w(u) for all neighbors u in U }
         std::unordered_set<node> I;
@@ -209,9 +299,13 @@ void my_graph::Graph<T>::jones_plassmann() {
 
         // for all vertices v in U do in parallel
         for (int i = 0; i < 4; i++) {
-            if (i == 3 && difference != 0) {
-                auto handle = async(std::launch::async, f, min, min + step + difference, i);
-            } else auto handle = async(std::launch::async, f, min, min + step, i);
+            if (i == 3 && difference != 0){
+                 async(std::launch::async, f, min, min + step + difference, i);
+            }
+            else{
+                async(std::launch::async, f, min, min + step, i);
+            }
+
             min += step;
         }
 

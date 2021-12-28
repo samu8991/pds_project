@@ -19,6 +19,7 @@
 #include <functional>
 #include <thread>
 #include <list>
+#include <random>
 
 
 using namespace std;
@@ -67,7 +68,7 @@ namespace my_graph {
         std::atomic<bool> alg_finished{false};
         std::mutex m;
     protected:
-        void
+        /*void
         parallel_count_adj(std::vector<int> &l) {
             std::vector<std::thread> threads(static_cast<T&>(*this).threadAvailable);
             int step = static_cast<T&>(*this).N/static_cast<T&>(*this).threadAvailable;int i = 0;
@@ -93,8 +94,8 @@ namespace my_graph {
                     t.join();
             }
             threads.clear();
-        }
-        void
+        }*/
+       /* void
         second_phase_luby(std::unordered_set<node>& I,std::vector<int>& d,int q){
 
             std::vector<std::thread> threads(static_cast<T&>(*this).threadAvailable);
@@ -107,8 +108,9 @@ namespace my_graph {
                     cout << "Thread " << j << " >> " << start << " , " << end << endl;
 
                     for(int i = start; i < end; ++i){
-                        cout << "Thread " << j << " d[i]= " << d[i] << endl;
+                        cout << "Thread " << j << " d[i]= " << d[i] << " - " << static_cast<T &>(*this).g[i].isDeleted<<endl;
                         if (d[i] == 0 && !static_cast<T &>(*this).g[i].isDeleted) {
+                            cout << "Entrato in d[i] == 0" << endl;
                             I.insert(i);
                             static_cast<T &>(*this).current_vertex_no--;
                             static_cast<T &>(*this).g[i].isDeleted = true;
@@ -116,9 +118,10 @@ namespace my_graph {
                             cout << "Current vertex number 1 " << static_cast<T &>(*this).current_vertex_no << endl;
                         }
                         if(d[i]>= n/16 && !static_cast<T &>(*this).g[i].isDeleted){
+                            cout << "Entrato in d[i] >= n/16" << endl;
                             I.insert(i);
                             node n;
-                            static_cast<T&>(*this).g[n].isDeleted = true;
+                            static_cast<T&>(*this).g[i].isDeleted = true;
                             static_cast<T&>(*this).current_vertex_no--;
                             for_each_neigh(i,&n,[this,n](){
                                 if(!static_cast<T &>(*this).g[n].isDeleted){
@@ -130,6 +133,7 @@ namespace my_graph {
                             });
                         }else if(d[i] < n/16 && !static_cast<T &>(*this).g[i].isDeleted){
                             assert(d[i] != 0);
+                            cout << "Entrato in d[i] < n/16" << endl;
                             std::unordered_set<node> X;
                             int y = rand()%(q-1);
                             int x = rand()%(q-1)+1;
@@ -139,21 +143,21 @@ namespace my_graph {
 
 
                             std::unordered_set<node>I_p(X);
-                            auto f1 = [this,&I_p,&d](int start,int end){
+                            auto f1 = [this,&I_p,&d,&X](int st,int en){
                                 Pair current_edge;
-                                std::function<void()> my_f = [this,&I_p,start,end,&d,&current_edge](){
+                                std::function<void()> my_f = [this,&I_p,st,en,&X,&d,&current_edge](){
                                     if (!static_cast<T &>(*this).g[current_edge.first].isDeleted && !static_cast<T &>(*this).g[current_edge.second].isDeleted
-                                        && current_edge.first >= start
-                                        && current_edge.first<= end
-                                        && current_edge.second >= start
-                                        && current_edge.second<= end){
-                                        if (d[current_edge.first]<= d[current_edge.second]) {
-                                            //auto it = std::find(I_p.begin(), I_p.end(), current_edge.first);
+                                        && current_edge.first >= st
+                                        && current_edge.first< en
+                                        && current_edge.second >= st
+                                        && current_edge.second< en
+                                        && X.find(current_edge.first)!= X.end()
+                                        && X.find(current_edge.second)!= X.end()){
+                                        if (d[current_edge.first]<= d[current_edge.second])
                                             I_p.erase(current_edge.first);
-                                        } else {
-                                            //auto it = std::find(I_p.begin(), I_p.end(), current_edge.second);
+                                         else
                                             I_p.erase(current_edge.second);
-                                        }
+
                                     }
                                 };
                                 static_cast<T&>(*this).for_each_edge(&current_edge,my_f);
@@ -177,6 +181,7 @@ namespace my_graph {
                                 static_cast<T&>(*this).g[curr].isDeleted = true;
                                 static_cast<T &>(*this).current_vertex_no--;
                                 for_each_neigh(curr,&nei,[this,nei](){
+
                                     static_cast<T&>(*this).g[nei].isDeleted = true;
                                     static_cast<T &>(*this).current_vertex_no--;
                                     assert(static_cast<T &>(*this).current_vertex_no >= 0);
@@ -199,7 +204,7 @@ namespace my_graph {
 
 
 
-        }
+        }*/
         int
         creat_prime() {
             int q = 0;
@@ -311,6 +316,26 @@ namespace my_graph {
             return static_cast<T &>(*this).for_each_edge(current_edge,f);
         }
 
+        void
+        generate_random_distr(std::unordered_set<node>& S,node start,node end){
+            node curr;
+            for_each_vertex(&curr, [&]() {
+                if(curr <= end && curr >= start && !static_cast<T&>(*this).g[curr].isDeleted){
+                    std::random_device rd;
+                    std::uniform_int_distribution<int> distribution(0, 1);
+                    std::mt19937 engine(rd()); // Mersenne twister MT19937
+                    int value = distribution(engine);
+                    float threshold = 0.2;
+
+                    if (value > threshold) {
+                        S.insert(curr);
+
+                    }
+                }
+            });
+
+
+        }
     };
 
     class GraphCSR :

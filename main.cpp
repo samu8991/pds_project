@@ -16,7 +16,7 @@ void automatic_simulation(int,vector<Pair>&);
 void menu();
 void show_benchmarks();
 void start();
-//#define PROVA
+#define PROVA
 int 
 main(){
 #ifdef PROVA
@@ -29,9 +29,10 @@ main(){
                                   Pair(6,5),Pair(6,1),Pair(6,4),
                                   Pair(7,5),Pair(7,3),Pair(7,1)};
       GraphCSR g(8,2,edge_array);
+      g.printGraph();
       g.luby();
 #endif
-    start();
+//    start();
     return EXIT_SUCCESS;
 
 
