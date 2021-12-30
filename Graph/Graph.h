@@ -68,6 +68,16 @@ namespace my_graph {
         std::atomic<bool> alg_finished{false};
         std::mutex m;
     protected:
+        int
+        degree_induced_graph(node curr){
+            int count = 0;
+            node nei;
+            for_each_neigh(curr,&nei,[this,&nei,&count](){
+               if(!static_cast<T&>(*this).g[nei].isDeleted)
+                   count++;
+            });
+            return count;
+        }
         /*void
         parallel_count_adj(std::vector<int> &l) {
             std::vector<std::thread> threads(static_cast<T&>(*this).threadAvailable);
@@ -318,9 +328,14 @@ namespace my_graph {
 
         void
         generate_random_distr(std::unordered_set<node>& S,node start,node end){
+            node nonsisamai = 8;
             node curr;
-            for_each_vertex(&curr, [&]() {
+            for_each_vertex(&curr, [&curr,&nonsisamai,this,&S,&start,&end]() {
                 if(curr <= end && curr >= start && !static_cast<T&>(*this).g[curr].isDeleted){
+                    if(!static_cast<T&>(*this).g[curr].isDeleted){
+                        nonsisamai = curr;
+                        //cout << "non 1 " << nonsisamai << endl;
+                    }
                     std::random_device rd;
                     std::uniform_int_distribution<int> distribution(0, 1);
                     std::mt19937 engine(rd()); // Mersenne twister MT19937
@@ -333,9 +348,15 @@ namespace my_graph {
                     }
                 }
             });
+            //cout << "non " << nonsisamai << endl;
+
+            if(S.size() == 0 && nonsisamai != 8)S.insert(nonsisamai);
+
 
 
         }
+
+        void stampaGrafo();
     };
 
     class GraphCSR :
