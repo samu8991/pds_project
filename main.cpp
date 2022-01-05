@@ -7,7 +7,7 @@
 
 using namespace std;
 using namespace my_graph;
-
+#define DEBUG 1
 void credits();
 std::string getEnv( const std::string & var );
 void readFile(string&,vector<Pair>&,int&);
@@ -16,7 +16,7 @@ void automatic_simulation(int,vector<Pair>&);
 void menu();
 void show_benchmarks();
 void start();
-#define DEBUG 0
+
 int 
 main(){
 #if DEBUG == 1

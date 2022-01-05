@@ -3,10 +3,11 @@
 //
 #include "Graph.h"
 #include <cassert>
+#define DEBUG 1
 
 using namespace std;
 
-#define DEBUG 0
+
 template<typename T>
 void
 my_graph::Graph<T>::sequential_algorithm() {
@@ -31,11 +32,7 @@ my_graph::Graph<T>::sequential_algorithm() {
                 if (static_cast<T &>(*this).g[n].color != -1)
                     C.insert(static_cast<T &>(*this).g[n].color);
             });
-            /*auto neighbours = boost::adjacent_vertices(vi, static_cast<T &>(*this).g);
-            for (auto vd: make_iterator_range(neighbours)) {
-                if (static_cast<T &>(*this).g[vd].color != -1)
-                    C.insert(static_cast<T &>(*this).g[vd].color);
-            }*/
+
             int c = 0;
             bool found = false;
             for (int j = 1; j <= last_used_color; j++) {
@@ -110,6 +107,7 @@ my_graph::Graph<T>::parallel_sequential_algorithm(){
 }
 
 
+
 template<typename T>
 void
 my_graph::Graph<T>::luby()
@@ -136,7 +134,7 @@ my_graph::Graph<T>::luby()
             }
             Pair e;
             // alla fine nodi che sono vicini non saranno entrambi nell'insieme S
-            for_each_edge(&e, [&S,&e,this,&uniqueLock]() {
+            for_each_edge(&e, [&S,&e,this]() {
 
                 if (S.find(e.first) != S.end() && S.find(e.second) != S.end()) {
 
@@ -187,6 +185,7 @@ my_graph::Graph<T>::luby()
 
     };
     while(BigC != 0){
+        cout << BigC << endl;
         k = 0;
         for (int j= 0; j < static_cast<T&>(*this).threadAvailable; ++j) {
             threads.emplace_back(core,k,k+step);
@@ -198,7 +197,6 @@ my_graph::Graph<T>::luby()
         }
         threads.clear();
 
-        //TODO questa operazione si può fare in paralello
         for(node node: I)
             static_cast<T&>(*this).g[node].color = current_color;
 
@@ -206,7 +204,6 @@ my_graph::Graph<T>::luby()
         node curr;
         BigC = static_cast<T&>(*this).N;
 
-        //TODO questa operazione si può fare in paralello
         for_each_vertex(&curr,[this,&curr,&BigC]{
             if(static_cast<T&>(*this).g[curr].color == -1){
                 static_cast<T&>(*this).g[curr].isDeleted = false;
@@ -222,6 +219,7 @@ my_graph::Graph<T>::luby()
 #endif
 
 }
+#pragma clang diagnostic pop
 template<typename T>
 void my_graph::Graph<T>::jones_plassmann() {
     // U := V    but in this case I'm interested only in the size, so I save the number of vertices N

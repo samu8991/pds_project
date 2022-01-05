@@ -34,7 +34,7 @@ GraphCSR::for_each_neigh(node current_vertex, node* neighbor, std::function<void
 
     BGL_FORALL_ADJ(current_vertex, neigh, g, graphCSR){
         *neighbor = neigh;
-            f();
+        f();
     }
 }
 
