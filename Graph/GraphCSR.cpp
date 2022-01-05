@@ -31,10 +31,11 @@ GraphCSR::for_each_vertex(node* current_vertex, std::function<void()> f){
 }
 void
 GraphCSR::for_each_neigh(node current_vertex, node* neighbor, std::function<void()> f){
+
     BGL_FORALL_ADJ(current_vertex, neigh, g, graphCSR){
-            *neighbor = neigh;
+        *neighbor = neigh;
             f();
-        }
+    }
 }
 
 void

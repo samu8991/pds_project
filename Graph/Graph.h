@@ -68,6 +68,34 @@ namespace my_graph {
         std::atomic<bool> alg_finished{false};
         std::mutex m;
     protected:
+        void
+        generate_random_distr(std::unordered_set<node>& S,node start,node end){
+            // serve per fare in modo che almeno un nodo venga preso dentro end e start
+            node nonsisamai = static_cast<T&>(*this).N+1;
+            node curr;
+            for_each_vertex(&curr, [&curr,&nonsisamai,this,&S,&start,&end]() {
+                // nodo compreso tra start e end e non deve essere stato cancellato
+                if(curr <= end && curr >= start && !static_cast<T&>(*this).g[curr].isDeleted){
+                    if(!static_cast<T&>(*this).g[curr].isDeleted){
+                        nonsisamai = curr;
+                        //cout << "non 1 " << nonsisamai << endl;
+                    }
+                    std::random_device rd;
+                    std::uniform_int_distribution<int> distribution(0, 1);
+                    std::mt19937 engine(rd()); // Mersenne twister MT19937
+                    int value = distribution(engine);
+                    float threshold = 0.2;
+
+                    if (value > threshold) {
+                        S.insert(curr);
+
+                    }
+                }
+            });
+            //cout << "non " << nonsisamai << endl;
+
+            if(S.size() == 0 && nonsisamai != static_cast<T&>(*this).N+1)S.insert(nonsisamai);
+        }
         int
         degree_induced_graph(node curr){
             int count = 0;
@@ -78,158 +106,6 @@ namespace my_graph {
             });
             return count;
         }
-        /*void
-        parallel_count_adj(std::vector<int> &l) {
-            std::vector<std::thread> threads(static_cast<T&>(*this).threadAvailable);
-            int step = static_cast<T&>(*this).N/static_cast<T&>(*this).threadAvailable;int i = 0;
-            for (int j= 0; j < static_cast<T&>(*this).threadAvailable; j++) {
-                threads.emplace_back([this,i,&l](int start,int end){
-                    for(node curr = start; curr < end; curr++){
-                        int count = 0;
-                        if(!static_cast<T&>(*this).g[curr].isDeleted){
-                            node n;
-                            for_each_neigh(curr,&n,[&count,this,&n](){
-                                if(!static_cast<T&>(*this).g[n].isDeleted)
-                                    count++;
-                            });
-                        }
-                        l[curr] = count;
-                    }
-                    },i,i+step);
-
-                i+=step;
-            }
-            for(auto& t:threads){
-                if(t.joinable())
-                    t.join();
-            }
-            threads.clear();
-        }*/
-       /* void
-        second_phase_luby(std::unordered_set<node>& I,std::vector<int>& d,int q){
-
-            std::vector<std::thread> threads(static_cast<T&>(*this).threadAvailable);
-            int step = static_cast<T&>(*this).N/static_cast<T&>(*this).threadAvailable;
-            int n = static_cast<T&>(*this).N;
-            int s = 0;
-            for (int j= 0; j < static_cast<T&>(*this).threadAvailable; j++) {
-                threads.emplace_back([this, j,&d, &I,n,q,step,&threads](int start, int end) {
-                    std::unique_lock<std::mutex> ul(m);
-                    cout << "Thread " << j << " >> " << start << " , " << end << endl;
-
-                    for(int i = start; i < end; ++i){
-                        cout << "Thread " << j << " d[i]= " << d[i] << " - " << static_cast<T &>(*this).g[i].isDeleted<<endl;
-                        if (d[i] == 0 && !static_cast<T &>(*this).g[i].isDeleted) {
-                            cout << "Entrato in d[i] == 0" << endl;
-                            I.insert(i);
-                            static_cast<T &>(*this).current_vertex_no--;
-                            static_cast<T &>(*this).g[i].isDeleted = true;
-                            assert(static_cast<T &>(*this).current_vertex_no >= 0);
-                            cout << "Current vertex number 1 " << static_cast<T &>(*this).current_vertex_no << endl;
-                        }
-                        if(d[i]>= n/16 && !static_cast<T &>(*this).g[i].isDeleted){
-                            cout << "Entrato in d[i] >= n/16" << endl;
-                            I.insert(i);
-                            node n;
-                            static_cast<T&>(*this).g[i].isDeleted = true;
-                            static_cast<T&>(*this).current_vertex_no--;
-                            for_each_neigh(i,&n,[this,n](){
-                                if(!static_cast<T &>(*this).g[n].isDeleted){
-                                    static_cast<T&>(*this).g[n].isDeleted = true;
-                                    static_cast<T&>(*this).current_vertex_no--;
-                                }
-                                assert(static_cast<T &>(*this).current_vertex_no >= 0);
-                                cout << "Current vertex number 2 " << static_cast<T &>(*this).current_vertex_no << endl;
-                            });
-                        }else if(d[i] < n/16 && !static_cast<T &>(*this).g[i].isDeleted){
-                            assert(d[i] != 0);
-                            cout << "Entrato in d[i] < n/16" << endl;
-                            std::unordered_set<node> X;
-                            int y = rand()%(q-1);
-                            int x = rand()%(q-1)+1;
-                            node n_i = q / (2 * d[i]);
-                            node l_i = (x + y * i) % q;
-                            if (l_i < n_i)X.insert(i);
-
-
-                            std::unordered_set<node>I_p(X);
-                            auto f1 = [this,&I_p,&d,&X](int st,int en){
-                                Pair current_edge;
-                                std::function<void()> my_f = [this,&I_p,st,en,&X,&d,&current_edge](){
-                                    if (!static_cast<T &>(*this).g[current_edge.first].isDeleted && !static_cast<T &>(*this).g[current_edge.second].isDeleted
-                                        && current_edge.first >= st
-                                        && current_edge.first< en
-                                        && current_edge.second >= st
-                                        && current_edge.second< en
-                                        && X.find(current_edge.first)!= X.end()
-                                        && X.find(current_edge.second)!= X.end()){
-                                        if (d[current_edge.first]<= d[current_edge.second])
-                                            I_p.erase(current_edge.first);
-                                         else
-                                            I_p.erase(current_edge.second);
-
-                                    }
-                                };
-                                static_cast<T&>(*this).for_each_edge(&current_edge,my_f);
-                            };
-                            std::vector<std::thread> otherthreads(static_cast<T&>(*this).threadAvailable);
-                            int k = 0;
-                            for (int j= 0; j < static_cast<T&>(*this).threadAvailable; j++) {
-                                otherthreads.emplace_back(f1,k,k+step);
-                                k+=step;
-                            }
-                            for(auto& t:otherthreads){
-                                if(t.joinable())
-                                    t.join();
-                            }
-                            otherthreads.clear();
-
-                            I.insert(I_p.begin(),I_p.end());
-                            for(auto iter = I_p.begin(); iter != I_p.end();++iter){
-                                node curr = *iter;
-                                node nei;
-                                static_cast<T&>(*this).g[curr].isDeleted = true;
-                                static_cast<T &>(*this).current_vertex_no--;
-                                for_each_neigh(curr,&nei,[this,nei](){
-
-                                    static_cast<T&>(*this).g[nei].isDeleted = true;
-                                    static_cast<T &>(*this).current_vertex_no--;
-                                    assert(static_cast<T &>(*this).current_vertex_no >= 0);
-                                    cout << "Current vertex number 3 " << static_cast<T &>(*this).current_vertex_no << endl;
-                                });
-                            }
-
-
-                        }
-                    }
-
-                }, s, s + step);
-                s += step;
-            }
-            for(auto& t:threads){
-                if(t.joinable())
-                    t.join();
-            }
-            threads.clear();
-
-
-
-        }*/
-        int
-        creat_prime() {
-            int q = 0;
-            int n = static_cast<T&>(*this).N;
-            for (int i = n; i <= 2 * n; i++) {
-                if ((i % 2 == 0) || (i % 3 == 0) || (i % 5 == 0) || (i % 7 == 0) || (i % 9 == 0)) {
-                    continue;
-                } else {
-                    q = i;
-                    break;
-                }
-            }
-            return q;
-        }
-
 
     public:
         /*** put here algorithms ***/
@@ -296,9 +172,19 @@ namespace my_graph {
         }
 
         void
-        printSol() {
-            for (node i = 0; i < static_cast<T &>(*this).N; ++i)
-                cout << static_cast<T &>(*this).g[i].color << endl;
+        printSolCorrectness() {
+            node curr;
+            for_each_vertex(&curr,[this,&curr](){
+                node nei;
+                cout << "Nodo: " << curr << " colore: " << static_cast<T &>(*this).g[curr].color << endl;
+                for_each_neigh(curr,&nei,[this,curr,&nei](){
+                    if(static_cast<T&>(*this).g[curr].color == static_cast<T&>(*this).g[nei].color){
+                        cout << "Incorrect solution \n";
+                        exit(-2);
+                    }
+                });
+            });
+            cout << "Solution is correct\n";
         }
 
         void
@@ -326,35 +212,6 @@ namespace my_graph {
             return static_cast<T &>(*this).for_each_edge(current_edge,f);
         }
 
-        void
-        generate_random_distr(std::unordered_set<node>& S,node start,node end){
-            node nonsisamai = 8;
-            node curr;
-            for_each_vertex(&curr, [&curr,&nonsisamai,this,&S,&start,&end]() {
-                if(curr <= end && curr >= start && !static_cast<T&>(*this).g[curr].isDeleted){
-                    if(!static_cast<T&>(*this).g[curr].isDeleted){
-                        nonsisamai = curr;
-                        //cout << "non 1 " << nonsisamai << endl;
-                    }
-                    std::random_device rd;
-                    std::uniform_int_distribution<int> distribution(0, 1);
-                    std::mt19937 engine(rd()); // Mersenne twister MT19937
-                    int value = distribution(engine);
-                    float threshold = 0.2;
-
-                    if (value > threshold) {
-                        S.insert(curr);
-
-                    }
-                }
-            });
-            //cout << "non " << nonsisamai << endl;
-
-            if(S.size() == 0 && nonsisamai != 8)S.insert(nonsisamai);
-
-
-
-        }
 
         void stampaGrafo();
     };

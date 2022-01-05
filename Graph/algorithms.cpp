@@ -3,8 +3,10 @@
 //
 #include "Graph.h"
 #include <cassert>
+
 using namespace std;
 
+#define DEBUG 0
 template<typename T>
 void
 my_graph::Graph<T>::sequential_algorithm() {
@@ -107,55 +109,7 @@ my_graph::Graph<T>::parallel_sequential_algorithm(){
     return;
 }
 
-/*template<typename T>
-void
-my_graph::Graph<T>::luby() {
-    std::unordered_set<node> I;
-    int q = my_graph::Graph<T>::creat_prime();
-    int current_color = 0;
-    int current_colored = 0;
-    std::vector<int> deg(static_cast<T &>(*this).N);
-label:
-    while (static_cast<T &>(*this).current_vertex_no != 0) {
-        parallel_count_adj(deg);
-        second_phase_luby(I, deg, q);
-        cout << "Current vertex number>> " << static_cast<T &>(*this).current_vertex_no << endl;
-    }
-    assert(static_cast<T &>(*this).current_vertex_no == 0);
-    for (auto node: I) {
-        static_cast<T &>(*this).g[node].color = current_color;
-        current_colored++;
-    }
-    current_color++;
-    if (current_colored != static_cast<T &>(*this).N) {
-        node n;
-        I.clear();
-        for_each_vertex(&n, [this,n]() {
-            if (static_cast<T &>(*this).g[n].color == -1) {
-                static_cast<T &>(*this).g[n].isDeleted = false;
-                static_cast<T &>(*this).current_vertex_no++;
-            }
-        });
-        goto label;
-    }
-    assert(current_colored == static_cast<T &>(*this).N);
-    printSol();
-}
-*/
-void stampaSet(std::unordered_set<my_graph::node>& I){
-    cout << "Stampo insieme >> ";
-    for(auto it = I.begin(); it!=I.end(); ++it)
-        cout << *it << " ";
-    cout << '\n';
-}
-template<typename T>
-void
-my_graph::Graph<T>::stampaGrafo(){
-    cout << "Proprietà grafo: ";
-    for(my_graph::node i = 0; i < static_cast<T&>(*this).N;i++ )
-        cout << static_cast<T&>(*this).g[i].isDeleted << " ";
-    cout << '\n';
-}
+
 template<typename T>
 void
 my_graph::Graph<T>::luby()
@@ -169,46 +123,22 @@ my_graph::Graph<T>::luby()
     int step = static_cast<T&>(*this).N/static_cast<T&>(*this).threadAvailable;step--;
     int k = 0;
     function<void(int,int)> core = [this,&I,&cvn](int start, int end){
-        bool go = true;
 
         while(1) {
-            //cout << "Thread "  << start << " - " << end << endl;
-            //cout << "CVN " << cvn << endl;
-            /*if(cvn == 0){
-                //cout << "Ci siamo di sopra " << endl;
-                assert(([this]()->bool{
-                    node curr;
-                    bool ret = true;
-                    for_each_vertex(&curr,[this,&curr,&ret]()->void{
-                        if(!static_cast<T&>(*this).g[curr].isDeleted){
-                            ret= false;
-                            return;
-                        }
-                    });
-                    return ret;
-                })());
-                uniqueLock.unlock();
-                break;
-            }*/
 
             std::unordered_set<node> S;
             std::unique_lock<mutex> uniqueLock(m);
             generate_random_distr(S, start, end);
 
             if(S.size() == 0){
-                //cout << "Prima" << endl;
-                //stampaGrafo();
                 uniqueLock.unlock();
                 break;
             }
-            //cout << "S1: ";
-            //stampaSet(S);
-
             Pair e;
+            // alla fine nodi che sono vicini non saranno entrambi nell'insieme S
             for_each_edge(&e, [&S,&e,this,&uniqueLock]() {
 
-                if (S.find(e.first) != S.end() && S.find(e.second) != S.end()/*&&
-                !static_cast<T&>(*this).g[e.first].isDeleted && !static_cast<T&>(*this).g[e.second].isDeleted*/) {
+                if (S.find(e.first) != S.end() && S.find(e.second) != S.end()) {
 
                     if (degree_induced_graph(e.first) < degree_induced_graph(e.second))
                         S.erase(e.first);
@@ -218,35 +148,25 @@ my_graph::Graph<T>::luby()
                 }
 
             });
-            //cout << "S2: ";
-            //stampaSet(S);
+
             for(auto it = S.begin(); it != S.end(); ++it){
-                //cout << "I1: ";
                 I.insert(*it);
-                //stampaSet(I);
                 if(!static_cast<T&>(*this).g[*it].isDeleted){
                     static_cast<T&>(*this).g[*it].isDeleted = true;
                     cvn--;
-                    //cout << "CVN1 " << cvn << endl;
-                    //stampaGrafo();
                     assert(cvn >= 0);
-
                 }
-                /*cout << "Seconda " << endl;
-                stampaGrafo();*/
                 node nei;
                 for_each_neigh(*it,&nei,[this,&nei,&cvn]() {
                     if (!static_cast<T &>(*this).g[nei].isDeleted ){
                         static_cast<T &>(*this).g[nei].isDeleted = true;
                         cvn--;
-                        //cout << "CVN2 " << cvn << endl;
-                        //stampaGrafo();
                         assert(cvn >= 0);
                     }
                 });
             }
             if(cvn<=0) {
-                //cout << "ci siamo " << endl;
+            #if DEBUG == 1
                 assert(([this]()->bool{
                     node curr;
                     bool ret = true;
@@ -258,6 +178,7 @@ my_graph::Graph<T>::luby()
                     });
                     return ret;
                 })());
+            #endif
                 uniqueLock.unlock();
                 break;
             }
@@ -277,31 +198,29 @@ my_graph::Graph<T>::luby()
         }
         threads.clear();
 
-        // Coloring nodes in I
-        /*cout << "Ora coloro ";
-        stampaSet(I);*/
-
         //TODO questa operazione si può fare in paralello
-        for(node node: I){
+        for(node node: I)
             static_cast<T&>(*this).g[node].color = current_color;
-        }
+
         current_color++;
         node curr;
         BigC = static_cast<T&>(*this).N;
+
         //TODO questa operazione si può fare in paralello
         for_each_vertex(&curr,[this,&curr,&BigC]{
-           if(static_cast<T&>(*this).g[curr].color == -1){
-               static_cast<T&>(*this).g[curr].isDeleted = false;
-           }//non trovato
-           else BigC--;
+            if(static_cast<T&>(*this).g[curr].color == -1){
+                static_cast<T&>(*this).g[curr].isDeleted = false;
+            }//non trovato
+            else BigC--;
         });
 
-        cout << "BigC >> " << BigC << endl;
-        //stampaGrafo();
         cvn = BigC;
         I.clear();
     }
-    printSol();
+#if DEBUG == 1
+    printSolCorrectness();
+#endif
+
 }
 template<typename T>
 void my_graph::Graph<T>::jones_plassmann() {
