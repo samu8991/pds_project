@@ -3,7 +3,7 @@
 //
 #include "Graph.h"
 #include <cassert>
-#define DEBUG 1
+#define DEBUG 0
 
 using namespace std;
 
@@ -23,7 +23,7 @@ my_graph::Graph<T>::sequential_algorithm() {
         /***********************************MAIN LOOP************************************************/
         std::unordered_set<int> C;
 
-        int last_used_color = 1; // colors are numerated starting from 1 and are always positive
+        int last_used_color = -1;
 
         for (int i = 0; i < static_cast<T &>(*this).N && !exit_thread_flag; i++) {
             node vi = rand_perm.extract(*rand_perm.begin()).value();
@@ -33,7 +33,7 @@ my_graph::Graph<T>::sequential_algorithm() {
                     C.insert(static_cast<T &>(*this).g[n].color);
             });
 
-            int c = 0;
+            int c = -1;
             bool found = false;
             for (int j = 1; j <= last_used_color; j++) {
                 if (C.count(j) == 0) {
@@ -43,7 +43,7 @@ my_graph::Graph<T>::sequential_algorithm() {
                 }
 
             }
-            if (!found)c = last_used_color;
+            if (!found)c = last_used_color+1;
             static_cast<T &>(*this).g[vi].color = c;
             last_used_color++;
             C.clear();
@@ -55,54 +55,63 @@ my_graph::Graph<T>::sequential_algorithm() {
 template<typename T>
 void
 my_graph::Graph<T>::parallel_sequential_algorithm(){
-    std::unordered_set<int> U, R;
-    for (int i = 0; i < static_cast<T &>(*this).N; i++)U.insert(i);
-    int colors[static_cast<T &>(*this).N];
-    for (int i = 0; i < static_cast<T &>(*this).N; i++)
-        colors[i] = -1;
+    int last_used_color = -1;
+    function<void(node,node)> core = [this,&last_used_color](node start,node end){
+        srand(time(nullptr));
+        std::unordered_set<int> rand_perm;
+        node curr = start;
+        while (curr <= end) {
+            rand_perm.insert(curr);
+            curr++;
+        }
+        std::unordered_set<int> C;
+        for(node i = start; i <= end; ++i){
+            node vi = rand_perm.extract(*rand_perm.begin()).value();
+            node n;
+            unique_lock<std::mutex> uniqueLock(m);
+            for_each_neigh(vi, &n, [this, &n, &C]() {
+                if (static_cast<T &>(*this).g[n].color != -1){
+                    C.insert(static_cast<T &>(*this).g[n].color);
+                }
+            });
+            uniqueLock.unlock();
+            int c = -1;
+            bool found = false;
+            uniqueLock.lock();
+            for (int j = 0; j <= last_used_color+1; j++) {
+                if (C.count(j) == 0) {
+                    c = j;
+                    found = true;
+                    break;
+                }
 
-    auto f = [&](int min, int max) {
-        int cur_color = 1;
-        for (node i = min; i < max; ++i) {
-            std::unordered_set<int> c(cur_color);
-            for (node j = 1; j <= cur_color; ++j)c.insert(j);
-            auto neighbours = boost::adjacent_vertices(i, static_cast<T &>(*this).g);
-            for (auto vd: make_iterator_range(neighbours))
-                c.extract(colors[vd]);
-            int color_tobe_assigned = *std::min_element(c.begin(), c.end());
-            colors[i] = color_tobe_assigned;
-            if (color_tobe_assigned > cur_color)cur_color = color_tobe_assigned;
+            }
+            if (!found)c = last_used_color+1;
+            static_cast<T &>(*this).g[vi].color = c;
+            last_used_color++;
+            uniqueLock.unlock();
+            C.clear();
         }
+
+        return;
     };
-    auto f1 = [&](int min, int max) {
-        int cur_color = 1;
-        for (node i = min; i < max; ++i) {
-            auto neighbours = boost::adjacent_vertices(i, static_cast<T &>(*this).g);
-            for (auto vd: make_iterator_range(neighbours))
-                if (colors[vd] == colors[i])
-                    R.insert(i);
-        }
-        U = R;
-    };
-    while (!U.empty()) {
-        int step = static_cast<T &>(*this).N / 4;
-        int difference = static_cast<T &>(*this).N % 4;
-        int min = 0;
-        for (int i = 0; i < 4; i++) {
-            if (i == 3 && difference != 0) {
-                auto handle = async(std::launch::async, f, min, min + step + difference);
-            } else auto handle = async(std::launch::async, f, min, min + step);
-            min += step;
-        }
-        //detect conflicts and create recoloring list
-        min = 0;
-        for (int i = 0; i < 4; i++) {
-            if (i == 3 && difference != 0) {
-                auto handle = async(std::launch::async, f1, min, min + step + difference);
-            } else auto handle = async(std::launch::async, f1, min, min + step);
-            min += step;
-        }
+    int k = 0;
+    std::vector<std::thread> threads(static_cast<T&>(*this).threadAvailable);
+    int step = static_cast<T&>(*this).N/static_cast<T&>(*this).threadAvailable;
+    step--;
+    for (int j= 0; j < static_cast<T&>(*this).threadAvailable; ++j) {
+        threads.emplace_back(core,k,k+step);
+        k+=(step+1);
     }
+    for(auto& t:threads){
+        if(t.joinable())
+            t.join();
+    }
+    threads.clear();
+#if DEBUG == 1
+    printSolCorrectness();
+#endif
+
     return;
 }
 
@@ -219,7 +228,7 @@ my_graph::Graph<T>::luby()
 #endif
 
 }
-#pragma clang diagnostic pop
+//#pragma clang diagnostic pop
 template<typename T>
 void my_graph::Graph<T>::jones_plassmann() {
     // U := V    but in this case I'm interested only in the size, so I save the number of vertices N

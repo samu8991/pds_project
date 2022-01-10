@@ -79,7 +79,6 @@ namespace my_graph {
                 if(curr <= end && curr >= start && !static_cast<T&>(*this).g[curr].isDeleted){
                     if(!static_cast<T&>(*this).g[curr].isDeleted){
                         nonsisamai = curr;
-                        //cout << "non 1 " << nonsisamai << endl;
                     }
                     std::random_device rd;
                     std::uniform_int_distribution<int> distribution(0, 1);

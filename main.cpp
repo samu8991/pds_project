@@ -7,7 +7,7 @@
 
 using namespace std;
 using namespace my_graph;
-#define DEBUG 1
+#define DEBUG 0
 void credits();
 std::string getEnv( const std::string & var );
 void readFile(string&,vector<Pair>&,int&);
@@ -30,7 +30,7 @@ main(){
                                   Pair(7,5),Pair(7,3),Pair(7,1)};
       GraphCSR g(8,2,edge_array);
       g.printGraph();
-      g.luby();
+      g.parallel_sequential_algorithm();
 #else
     start();
 #endif
