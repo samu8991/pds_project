@@ -29,7 +29,7 @@ main(){
                                   Pair(6,5),Pair(6,1),Pair(6,4),
                                   Pair(7,5),Pair(7,3),Pair(7,1)};
       GraphCSR g(8,2,edge_array);
-      g.printGraph();
+      gprintGraph();
       g.parallel_sequential_algorithm();
 #else
     start();
