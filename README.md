@@ -19,7 +19,7 @@ such that for each (u,v) in E C(v) <> C(u).
 This project can be executed either on windows or linux os.
 
 
-###Linux
+### Linux
 
 Software needed:
 - cmake(>=3.17)
@@ -38,7 +38,7 @@ build directory and then hit the following:
 ```
 $ cmake .. && make
 ```
-###Windows
+### Windows
 
 //TODO GIACOMO
 
