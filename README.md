@@ -44,7 +44,7 @@ Software needed:
 - boost library
 
 On Windows distribution compute the following instruction:
-- Download Boost from the official site
+- Download Boost from the [official site](https://www.boost.org/users/download/)
 - Extract Boost from the *.7z* folder
 - Open the Boost folder and run *bootstrap.bat*; it creates the file *b2.exe*
 - Run *b2.exe* and wait it finishes
