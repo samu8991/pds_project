@@ -19,9 +19,10 @@ such that for each (u,v) in E C(v) <> C(u).
 This project can be executed either on windows or linux os.
 
 
-### Linux
+### Linux <a name="linux_build"></a>
 
 Software needed:
+- Download Boost from the [official site](https://www.boost.org/users/download/)
 - cmake(>=3.17)
 - make
 - boost filesystem library
@@ -38,7 +39,7 @@ build directory and then hit the following:
 ```
 $ cmake .. && make
 ```
-### Windows
+### Windows <a name="windows_build"></a>
 
 Software needed:
 - boost library

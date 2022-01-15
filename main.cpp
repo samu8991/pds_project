@@ -1,8 +1,8 @@
+#include "Graph/Graph.h"
 #include <iostream>
 #include <string>
 #include <cstdlib>
 #include <boost/filesystem.hpp>
-#include "Graph/Graph.h"
 
 
 using namespace std;
