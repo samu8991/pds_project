@@ -21,12 +21,13 @@ if(UNIX)
 endif(UNIX)
 
 if(WIN32)
+    set(Boost_USE_STATIC_LIBS ON)
+    set(BOOST_ROOT C:/boost)
     find_package (Threads REQUIRED)
-    find_package(Boost COMPONENTS program_options filesystem REQUIRED)
+    find_package(Boost 1.77.0 COMPONENTS program_options filesystem REQUIRED)
     INCLUDE_DIRECTORIES( ${Boost_INCLUDE_DIR} )
 
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
-    include_directories("C:/boost")
 
     add_executable(pds_project
         main.cpp
