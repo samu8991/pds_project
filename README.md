@@ -50,7 +50,12 @@ On Windows distribution compute the following instruction:
 - Open the Boost folder and run *bootstrap.bat*; it creates the file *b2.exe*
 - Run *b2.exe* and wait it finishes
 
-//FINIRE
+In order to compile you have to put yourself inside the 
+build directory and then hit the following:
+
+```
+$ cmake .. && make
+```
 
 
 
