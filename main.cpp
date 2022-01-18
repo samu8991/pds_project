@@ -142,7 +142,7 @@ menu(){
     cout << "This program solves the vertex coloring problem implementing 3 parallel algorithms:\n";
     cout << "- Luby algorithm\n- Parallel sequential algorithm\n- Jones_plassmann\n";
     cout << "In order to have more realistic simulations, another feature of this program is that graphs are implemented whith 3 different"
-            "rappresentations: \n";
+            " rappresentations: \n";
     cout << "- Adjacent List\n- Adjacency Matrix\n- Compressed Sparse Row\n";
 }
 void
