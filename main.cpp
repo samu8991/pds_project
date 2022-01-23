@@ -7,19 +7,20 @@
 
 using namespace std;
 using namespace my_graph;
-#define DEBUG 0
+#define DEBUG 1
+
+
 void credits();
 std::string getEnv( const std::string & var );
 void readFile(string&,vector<Pair>&,int&);
 void run_simulation(int,int16_t,int16_t,vector<Pair>&);
-void automatic_simulation(int,vector<Pair>&);
 void menu();
 void show_benchmarks();
-void start();
+void start(vector<Pair>&,int,int16_t,int16_t,int,std::string);
 
 int 
-main(){
-#if DEBUG == 1
+main(int argc, char* argv[]){
+#if DEBUG == 0
     vector<Pair> edge_array = { Pair(0,1), Pair(0,2), Pair(0,3),Pair(0,4),Pair(0,5),
                                   Pair(1,0),Pair(1,3),Pair(1,4),Pair(1,5),Pair(1,6),Pair(1,7),
                                   Pair(2,0),
@@ -29,10 +30,32 @@ main(){
                                   Pair(6,5),Pair(6,1),Pair(6,4),
                                   Pair(7,5),Pair(7,3),Pair(7,1)};
       GraphCSR g(8,2,edge_array);
-      gprintGraph();
+      g.printGraph();
       g.parallel_sequential_algorithm();
 #else
-    start();
+      vector<Pair> edges;int V=0;
+      std::string fileName;int16_t r,a;
+      int nothreads;
+      if(argc == 1){
+          credits();
+          menu();
+          show_benchmarks();
+          cout << "Choose thread's number(1,2,4,8 or hardware based(0))";
+          cin>>nothreads;
+          cout << "Choose the graph you want to use for this test >> ";
+          cin >> fileName;
+          cout << "Choose the rappresentation >> ";
+          cin >> r;
+          cout << "Choose the algorithm >> ";
+          cin >> a;
+      }
+      else if(argc == 5){
+        r = (int16_t) strtoul(argv[1], NULL, 0);
+        a = (int16_t) strtoul(argv[2], NULL, 0);
+        nothreads = (int16_t) strtoul(argv[3],NULL,0);
+        fileName = argv[4];
+      }
+      start(edges,V,r,a,nothreads,fileName);
 #endif
     return EXIT_SUCCESS;
 }
@@ -114,7 +137,7 @@ run_simulation(int V,int16_t r,int16_t a,vector<Pair>& edges, int8_t nothreads){
 
     }
 }
-void
+/*void
 automatic_simulation(int V,vector<Pair>& edges,int8_t nothreads){
     cout << "Automatic testing procedure entered\n";
     cout << "Every graph will be tested 9 times one time for each rappresentation and algorithm\n ";
@@ -135,14 +158,15 @@ automatic_simulation(int V,vector<Pair>& edges,int8_t nothreads){
         }
         i++;
     }
-}
+}*/
+
 void
 menu(){
 
     cout << "This program solves the vertex coloring problem implementing 3 parallel algorithms:\n";
     cout << "- Luby algorithm\n- Parallel sequential algorithm\n- Jones_plassmann\n";
     cout << "In order to have more realistic simulations, another feature of this program is that graphs are implemented whith 3 different"
-            " rappresentations: \n";
+            "rappresentations: \n";
     cout << "- Adjacent List\n- Adjacency Matrix\n- Compressed Sparse Row\n";
 }
 void
@@ -161,27 +185,7 @@ show_benchmarks(){
 
 }
 void
-start(){
-    vector<Pair> edges;int V=0;
-    string fileName,automatic;int16_t r,a;
-    int nothreads;
-    credits();
-    menu();
-    show_benchmarks();
-    cout<< "Do you want an automatic testing procedure? (y/n)";
-    cin>>automatic;
-    cout << "Choose thread's number(1,2,4,8 or hardware based(0))";
-    cin>>nothreads;
-    if(automatic == "y")
-        automatic_simulation(V,edges,nothreads);
-    else {
-        cout << "Choose the graph you want to use for this test >> ";
-        cin >> fileName;
-        cout << "Choose the rappresentation >> ";
-        cin >> r;
-        cout << "Choose the algorithm >> ";
-        cin >> a;
-        readFile(fileName, edges, V);
-        run_simulation(V, r, a, edges,nothreads);
-    }
+start(vector<Pair>& edges,int V,int16_t r,int16_t a,int nothreads,std::string fileName){
+    readFile(fileName, edges, V);
+    run_simulation(V, r, a, edges,nothreads);
 }

@@ -14,6 +14,7 @@
 #include <boost/graph/graph_utility.hpp>
 #include <atomic>
 #include <ctime>
+#include <exception>
 #include <memory>
 #include <future>
 #include <functional>
@@ -124,7 +125,7 @@ namespace my_graph {
         void
         startAlg(int16_t a){
             cout << "Starting simulation...\n";
-            high_resolution_clock::time_point start = high_resolution_clock::now();
+            /*high_resolution_clock::time_point start = high_resolution_clock::now();
             thread t1([&](){
                 int end = 60;
                 int t = 0;
@@ -134,7 +135,7 @@ namespace my_graph {
                 }
                 if(!alg_finished)exit_thread_flag = true;
                 else;
-            });
+            });*/
             switch (a) {
                 case seq : {
                     cout << "Algorithm used is : sequential" << "\n";
@@ -159,8 +160,14 @@ namespace my_graph {
                 default:
                         break;
             }
-            alg_finished = true;
-            if(exit_thread_flag)throw "Time exceded\n";
+            /*alg_finished = true;
+            if(exit_thread_flag){
+                try{
+                    throw std::runtime_error("unexpected end of stream");
+                }catch(const runtime_error& e){
+                    cerr << "Time limit exceeded\n";
+                }
+            }
             else{
                 high_resolution_clock::time_point end = high_resolution_clock::now();
                 auto duration = duration_cast<microseconds>(end - start);
@@ -168,7 +175,7 @@ namespace my_graph {
                 cout << "Execution time >> " << duration.count() << "\u03BCs" << "(" << durations.count() <<"s)"<<endl;
                 cout << "Simulation ended\n";
             }
-            t1.join();
+            t1.join();*/
         }
 
         void
