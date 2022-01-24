@@ -169,7 +169,7 @@ menu(){
             "   - Parallel sequential algorithm        [2]\n"
             "   - Jones_plassmann                      [3]\n";
     cout << "In order to have more realistic simulations, another feature of this program is that graphs are implemented whith 3 different"
-            "rappresentations: \n";
+            " rappresentations: \n";
     cout << "   - Adjacent List                        [0]\n"
             "   - Adjacency Matrix                     [1]\n"
             "   - Compressed Sparse Row                [2]\n";
