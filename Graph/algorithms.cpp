@@ -13,6 +13,7 @@ void
 my_graph::Graph<T>::sequential_algorithm() {
 
         /*************************************random permutation*************************************/
+        // choose a random permutation p(1), ... , p(n) of numbers 1, ..., n
         srand(time(nullptr));
         std::unordered_set<int> rand_perm;
         while (rand_perm.size() != static_cast<T &>(*this).N) {
@@ -21,11 +22,14 @@ my_graph::Graph<T>::sequential_algorithm() {
         }
 
         /***********************************MAIN LOOP************************************************/
+        // C := {colors of all colored neighbors of the selected vertex}
         std::unordered_set<int> C;
 
         int last_used_color = -1;
 
+        // for i to n do in sequence
         for (int i = 0; i < static_cast<T &>(*this).N && !exit_thread_flag; i++) {
+            // v := p(i)
             node vi = rand_perm.extract(*rand_perm.begin()).value();
             node n;
             for_each_neigh(vi, &n, [this, &n, &C]() {
@@ -35,7 +39,7 @@ my_graph::Graph<T>::sequential_algorithm() {
 
             int c = -1;
             bool found = false;
-            for (int j = 1; j <= last_used_color; j++) {
+            for (int j = 0; j <= last_used_color; j++) {
                 if (C.count(j) == 0) {
                     c = j;
                     found = true;
@@ -44,6 +48,7 @@ my_graph::Graph<T>::sequential_algorithm() {
 
             }
             if (!found)c = last_used_color+1;
+            // c(v) := {smallest color not in C}
             static_cast<T &>(*this).g[vi].color = c;
             last_used_color++;
             C.clear();
@@ -57,6 +62,7 @@ void
 my_graph::Graph<T>::parallel_sequential_algorithm(){
     int last_used_color = -1;
     function<void(node,node)> core = [this,&last_used_color](node start,node end){
+        // choose a random permutation of nodes p(i)
         srand(time(nullptr));
         std::unordered_set<int> rand_perm;
         node curr = start;
@@ -64,11 +70,15 @@ my_graph::Graph<T>::parallel_sequential_algorithm(){
             rand_perm.insert(curr);
             curr++;
         }
+        // C := {colors of all colored neighbors of the selected vertex}
         std::unordered_set<int> C;
+        // for all nodes
         for(node i = start; i <= end; ++i){
+            // v := p(i)
             node vi = rand_perm.extract(*rand_perm.begin()).value();
             node n;
             unique_lock<std::mutex> uniqueLock(m);
+
             for_each_neigh(vi, &n, [this, &n, &C]() {
                 if (static_cast<T &>(*this).g[n].color != -1){
                     C.insert(static_cast<T &>(*this).g[n].color);
@@ -78,6 +88,8 @@ my_graph::Graph<T>::parallel_sequential_algorithm(){
             int c = -1;
             bool found = false;
             uniqueLock.lock();
+
+            // c(v):= smallest color not in C
             for (int j = 0; j <= last_used_color+1; j++) {
                 if (C.count(j) == 0) {
                     c = j;
@@ -121,9 +133,10 @@ template<typename T>
 void
 my_graph::Graph<T>::luby()
 {
-
+    // I <- empty
     std::unordered_set<node> I;
     int current_color = 0;
+    // G'= (V',E') <- G= (V,E)
     int BigC = static_cast<T&>(*this).N;
     int cvn = static_cast<T&>(*this).N;
     std::vector<std::thread> threads(static_cast<T&>(*this).threadAvailable);
@@ -132,8 +145,10 @@ my_graph::Graph<T>::luby()
     function<void(int,int)> core = [this,&I,&cvn](int start, int end){
 
         while(1) {
-
+            // X = empty
             std::unordered_set<node> S;
+
+            // randomly choose to add v to X
             std::unique_lock<mutex> uniqueLock(m);
             generate_random_distr(S, start, end);
 
@@ -143,13 +158,16 @@ my_graph::Graph<T>::luby()
             }
             Pair e;
             // alla fine nodi che sono vicini non saranno entrambi nell'insieme S
+            // for all v in X, w in X
             for_each_edge(&e, [&S,&e,this]() {
-
+                // if (v,w) in E' then
                 if (S.find(e.first) != S.end() && S.find(e.second) != S.end()) {
-
+                    // if d(v) <= d(w) then
                     if (degree_induced_graph(e.first) < degree_induced_graph(e.second))
+                        // I' <- I' - {v}
                         S.erase(e.first);
                     else
+                        // else I' <- I' - {w}
                         S.erase(e.second);
 
                 }
@@ -193,6 +211,7 @@ my_graph::Graph<T>::luby()
         }
 
     };
+    // while V' is not empty
     while(BigC != 0){
         cout << BigC << endl;
         k = 0;
@@ -205,7 +224,7 @@ my_graph::Graph<T>::luby()
                 t.join();
         }
         threads.clear();
-
+        // color all vertices in the MIS and remove them from G'
         for(node node: I)
             static_cast<T&>(*this).g[node].color = current_color;
 
@@ -226,9 +245,9 @@ my_graph::Graph<T>::luby()
 #if DEBUG == 1
     printSolCorrectness();
 #endif
-
+return;
 }
-//#pragma clang diagnostic pop
+
 template<typename T>
 void my_graph::Graph<T>::jones_plassmann() {
     // U := V    but in this case I'm interested only in the size, so I save the number of vertices N
@@ -315,6 +334,7 @@ void my_graph::Graph<T>::jones_plassmann() {
         }
 
     }
+    return;
 }
 
 template
