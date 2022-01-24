@@ -56,10 +56,6 @@ build directory and then hit the following:
 ```
 $ cmake .. && make
 ```
-
-
-
-
 ---
 
 ## Usage <a name="usage"></a>
@@ -69,4 +65,7 @@ benchmarks folder inside a specific folder.
 As far as windows is concerned 
 the folder is: "C:" while in linux is: "/home/username" or
 the well known "~".
+There are actually two ways of executing the program:
+1. without arguments, the program will guide the user
+2. with arguments(rappresentation,algorithm,no. threads, file name). We used this for testing
 

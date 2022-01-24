@@ -74,12 +74,12 @@ credits(){
     std::cout << "Vertex Coloring Project" << '\n';
     std::cout << "Politecnico di Torino 2020/2021\n";
     std::cout << "Professors:\n";
-    std::cout << " - Alessandro Savino\n";
-    std::cout << " - Stefano Quer\n";
+    std::cout << "  - Alessandro Savino\n";
+    std::cout << "  - Stefano Quer\n";
     std::cout << "Students:\n";
-    std::cout << " - Paone Samuele\n";
-    std::cout << " - Manca Davide\n";
-    std::cout << " - Vitali Giacomo\n";
+    std::cout << "  - Paone Samuele\n";
+    std::cout << "  - Manca Davide\n";
+    std::cout << "  - Vitali Giacomo\n";
     std::cout << "***************************************MENU************************************************\n";
 }
 void
@@ -163,11 +163,16 @@ automatic_simulation(int V,vector<Pair>& edges,int8_t nothreads){
 void
 menu(){
 
-    cout << "This program solves the vertex coloring problem implementing 3 parallel algorithms:\n";
-    cout << "- Luby algorithm\n- Parallel sequential algorithm\n- Jones_plassmann\n";
+    cout << "This program solves the vertex coloring problem implementing 3 parallel algorithms and 1 sequential:\n";
+    cout << "   - Sequential                           [0]\n"
+            "   - Luby algorithm                       [1]\n"
+            "   - Parallel sequential algorithm        [2]\n"
+            "   - Jones_plassmann                      [3]\n";
     cout << "In order to have more realistic simulations, another feature of this program is that graphs are implemented whith 3 different"
             "rappresentations: \n";
-    cout << "- Adjacent List\n- Adjacency Matrix\n- Compressed Sparse Row\n";
+    cout << "   - Adjacent List                        [0]\n"
+            "   - Adjacency Matrix                     [1]\n"
+            "   - Compressed Sparse Row                [2]\n";
 }
 void
 show_benchmarks(){
