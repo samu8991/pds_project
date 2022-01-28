@@ -8,8 +8,8 @@ if [ $# -ne 3 ]; then
 fi
 
 case $1 in
-    0)r="Adjacency Matrix";;
-    1)r="Adjacency List";;
+    0)r="Adjacency List";;
+    1)r="Adjacency Matrix";;
     2)r="Compressed Sparse Row";;
     *)
         echo "Wrong choice! rappresentation goes from 0 to 2"

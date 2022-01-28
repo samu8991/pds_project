@@ -10,7 +10,7 @@ using namespace my_graph;
 #define DEBUG 1
 
 
-void credits();
+void info();
 std::string getEnv( const std::string & var );
 void readFile(string&,vector<Pair>&,int&);
 void run_simulation(int,int16_t,int16_t,vector<Pair>&);
@@ -37,7 +37,6 @@ main(int argc, char* argv[]){
       std::string fileName;int16_t r,a;
       int nothreads;
       if(argc == 1){
-          credits();
           menu();
           show_benchmarks();
           cout << "Choose thread's number(1,2,4,8 or hardware based(0))";
@@ -69,17 +68,13 @@ std::string getEnv( const std::string & var ) {
     }
 }
 void
-credits(){
+info(){
     std::cout << "**************************************CREDITS*********************************************\n";
     std::cout << "Vertex Coloring Project" << '\n';
     std::cout << "Politecnico di Torino 2020/2021\n";
     std::cout << "Professors:\n";
     std::cout << "  - Alessandro Savino\n";
     std::cout << "  - Stefano Quer\n";
-    std::cout << "Students:\n";
-    std::cout << "  - Paone Samuele\n";
-    std::cout << "  - Manca Davide\n";
-    std::cout << "  - Vitali Giacomo\n";
     std::cout << "***************************************MENU************************************************\n";
 }
 void
@@ -165,9 +160,10 @@ menu(){
 
     cout << "This program solves the vertex coloring problem implementing 3 parallel algorithms and 1 sequential:\n";
     cout << "   - Sequential                           [0]\n"
-            "   - Luby algorithm                       [1]\n"
-            "   - Parallel sequential algorithm        [2]\n"
+            "   - Parallel sequential algorithm        [1]\n"
+            "   - Luby                                 [2]\n"
             "   - Jones_plassmann                      [3]\n";
+            
     cout << "In order to have more realistic simulations, another feature of this program is that graphs are implemented whith 3 different"
             " rappresentations: \n";
     cout << "   - Adjacent List                        [0]\n"
