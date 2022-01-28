@@ -19,7 +19,7 @@ case $2 in
     0)a="Sequential";;
     1)a="Parallel Sequential";;
     2)a="Luby";;
-    3)a="Joness Plassman";;
+    3)a="Jones Plassman";;
     *)
         echo "Wrong choice! algorithms goes from 0 to 3"
         exit -3;;
@@ -33,8 +33,7 @@ benchmark_dir=~/benchmarks
 build_dir=~/CLionProjects/pds_project/cmake-build-debug
 cd $benchmark_dir && ls | grep 'rgg_n_2_1' >$build_dir/graphs.txt
 cd $build_dir
-rm time_values.dat
-rm space_values.dat
+rm time_values.dat space_values.dat
 i=1
 while read -r g; do
     echo "Simulation number: $i" 
@@ -54,7 +53,7 @@ done < graphs.txt
 gnuplot -persist <<-EOFMarker
     set terminal png
     set output '${a}Time.png'
-    set title "$a time simulation";
+    set title "$a time simulation($3 threads)";
 
     set xlabel "Number of nodes(10^x)"
     set ylabel "Time(seconds)"
@@ -62,13 +61,12 @@ gnuplot -persist <<-EOFMarker
     set xtics 1
     plot "time_values.dat" with lines lw 3
 
-    pause -1 "Hit Enter to continue" 
      
 EOFMarker
 gnuplot -persist <<-EOFMarker
     set terminal png
     set output '${a}Space.png'
-    set title "$a space occupation simulation";
+    set title "$a space occupation simulation($3 threads)";
 
     set xlabel "Number of nodes(10^x)"
     set ylabel "Space(MB)"
