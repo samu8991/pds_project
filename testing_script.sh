@@ -25,14 +25,21 @@ case $2 in
         exit -3;;
 esac
 
+case $3 in
+    0) t="hw";;
+    1) t=$3;;
+    2) t=$3;;
+    4) t=$3;;
+    8) t=$3;;
+    *) exit -4;;
+esac
 
 ###########################################################
 #                       SIMULATION                        #  
 ###########################################################
 benchmark_dir=~/benchmarks
 build_dir=~/CLionProjects/pds_project/cmake-build-debug
-cd $benchmark_dir && ls | grep 'rgg_n_2_1' >$build_dir/graphs.txt
-cd $build_dir
+cd $benchmark_dir && ls | grep 'rgg_n_2_[1-2][5-9|1-2]'>$build_dir/graphs.txt && cd $build_dir
 rm time_values.dat space_values.dat
 i=1
 while read -r g; do
@@ -52,10 +59,10 @@ done < graphs.txt
 ##########################################################
 gnuplot -persist <<-EOFMarker
     set terminal png
-    set output '${a}Time.png'
-    set title "$a time simulation($3 threads)";
+    set output '${a}Time($t)threads.png'
+    set title "$a time simulation($t threads)";
 
-    set xlabel "Number of nodes(10^x)"
+    set xlabel "Number of nodes(2^x)"
     set ylabel "Time(seconds)"
     set grid 
     set xtics 1
@@ -65,10 +72,10 @@ gnuplot -persist <<-EOFMarker
 EOFMarker
 gnuplot -persist <<-EOFMarker
     set terminal png
-    set output '${a}Space.png'
-    set title "$a space occupation simulation($3 threads)";
+    set output '${a}Space($t)threads.png'
+    set title "$a space occupation simulation($t threads)";
 
-    set xlabel "Number of nodes(10^x)"
+    set xlabel "Number of nodes(2^x)"
     set ylabel "Space(MB)"
     set grid 
     set xtics 1
