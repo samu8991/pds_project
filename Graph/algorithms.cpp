@@ -213,7 +213,9 @@ my_graph::Graph<T>::luby()
     };
     // while V' is not empty
     while(BigC != 0){
+        #if DEBUG == 1
         cout << BigC << endl;
+        #endif
         k = 0;
         for (int j= 0; j < static_cast<T&>(*this).threadAvailable; ++j) {
             threads.emplace_back(core,k,k+step);

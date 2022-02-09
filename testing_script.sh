@@ -22,7 +22,7 @@ case $2 in
     3)a="Jones Plassman";;
     *)
         echo "Wrong choice! algorithms goes from 0 to 3"
-        exit -3;;
+        exit -4;;
 esac
 
 case $3 in
@@ -31,8 +31,44 @@ case $3 in
     2) t=$3;;
     4) t=$3;;
     8) t=$3;;
-    *) exit -4;;
+    *) exit -5;;
 esac
+###########################################################
+#                       FUNCTIONS                         #
+###########################################################
+print_value_sofar(){
+    echo "Time Excedeed"
+    echo "Now I will plot results where the program stopped"
+gnuplot -persist <<-EOFMarker
+    set terminal png
+    set output '${a}Time($t)threads[$r]TimeExceeded.png'
+    set title "$a time simulation($t threads)[$r]TimeExceeded";
+
+    set xlabel "Number of nodes(2^x)"
+    set ylabel "Time(seconds)"
+    set grid 
+    set xtics 1
+    plot "time_values.dat" with lines lw 3
+
+     
+EOFMarker
+gnuplot -persist <<-EOFMarker
+    set terminal png
+    set output '${a}Space($t)threads[$r]TimeExceeded.png'
+    set title "$a space occupation simulation($t threads)[$r]TimeExceeded";
+
+    set xlabel "Number of nodes(2^x)"
+    set ylabel "Space(MB)"
+    set grid 
+    set xtics 1
+    plot "space_values.dat" with lines lw 3
+
+    pause -1 "Hit Enter to continue" 
+     
+EOFMarker
+mv $a* "test_immages/$a"
+    exit -5        
+}         
 
 ###########################################################
 #                       SIMULATION                        #  
@@ -40,11 +76,19 @@ esac
 benchmark_dir=~/benchmarks
 build_dir=~/CLionProjects/pds_project/cmake-build-debug
 cd $benchmark_dir && ls | grep 'rgg_n_2_[1-2][5-9|1-2]'>$build_dir/graphs.txt && cd $build_dir
-rm time_values.dat space_values.dat
+if [ -f time_values.txt ]
+    then
+        rm time_values.dat 
+fi
+
+if [ -f space_values.dat ]
+    then
+        rm space_values.dat
+fi
 i=1
 while read -r g; do
     echo "Simulation number: $i" 
-    runlim -o analisi.txt ./pds_project $1 $2 $3 $g 
+    runlim -o analisi.txt -t 600 ./pds_project $1 $2 $3 $g || print_value_sofar #time limit a 10 min 
     sed -i -e 's/\[runlim\]//g' analisi.txt
     let i=$i+14
     while read -r descr val; do
@@ -59,8 +103,8 @@ done < graphs.txt
 ##########################################################
 gnuplot -persist <<-EOFMarker
     set terminal png
-    set output '${a}Time($t)threads.png'
-    set title "$a time simulation($t threads)";
+    set output '${a}Time($t)threads[$r].png'
+    set title "$a time simulation($t threads)[$r]";
 
     set xlabel "Number of nodes(2^x)"
     set ylabel "Time(seconds)"
@@ -72,8 +116,8 @@ gnuplot -persist <<-EOFMarker
 EOFMarker
 gnuplot -persist <<-EOFMarker
     set terminal png
-    set output '${a}Space($t)threads.png'
-    set title "$a space occupation simulation($t threads)";
+    set output '${a}Space($t)threads[$r].png'
+    set title "$a space occupation simulation($t threads)[$r]";
 
     set xlabel "Number of nodes(2^x)"
     set ylabel "Space(MB)"
@@ -87,6 +131,7 @@ EOFMarker
 if [ ! -d "$build_dir/test_immages" ]; then 
     mkdir test_immages
 fi
-mv *.png test_immages
-#
+
+mv $a* "test_immages/$a"
+
 exit 0
