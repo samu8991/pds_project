@@ -7,7 +7,7 @@
 
 using namespace std;
 using namespace my_graph;
-#define DEBUG 1
+#define DEBUG 0
 
 
 void info();
@@ -20,7 +20,7 @@ void start(vector<Pair>&,int,int16_t,int16_t,int,std::string);
 
 int 
 main(int argc, char* argv[]){
-#if DEBUG == 0
+#if DEBUG == 1
     vector<Pair> edge_array = { Pair(0,1), Pair(0,2), Pair(0,3),Pair(0,4),Pair(0,5),
                                   Pair(1,0),Pair(1,3),Pair(1,4),Pair(1,5),Pair(1,6),Pair(1,7),
                                   Pair(2,0),

@@ -336,6 +336,9 @@ void my_graph::Graph<T>::jones_plassmann() {
         }
 
     }
+#if DEBUG == 1
+    printSolCorrectness();
+#endif
     return;
 }
 

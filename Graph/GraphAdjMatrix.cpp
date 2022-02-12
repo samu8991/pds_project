@@ -16,7 +16,7 @@ GraphAdjMatrix::GraphAdjMatrix(int N, int nothreads,vector<Pair>& edge_array){
             g[current_vertex].isDeleted = false;
             g[current_vertex].weight = rand() % 100 + 1;
     }
-    cout << "Graph constructed:\n -Internal rappresentation >> Adjacent Matrix \n -Number of nodes >> " << N << "\n";
+    cout << "Graph constructed:\n -Internal rappresentation >> Adjacent Matrix \n -Number of nodes >> " << N << "\n -Number of branches >> " << edge_array.size() << "\n -avg. node degree>> "<< edge_array.size()/N <<"\n";
 }
 
 void

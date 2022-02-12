@@ -66,7 +66,7 @@ gnuplot -persist <<-EOFMarker
     pause -1 "Hit Enter to continue" 
      
 EOFMarker
-mv $a* "test_immages/$a"
+mv *.png "test_immages/$a"
     exit -5        
 }         
 
@@ -75,8 +75,8 @@ mv $a* "test_immages/$a"
 ###########################################################
 benchmark_dir=~/benchmarks
 build_dir=~/CLionProjects/pds_project/cmake-build-debug
-cd $benchmark_dir && ls | grep 'rgg_n_2_[1-2][5-9|1-2]'>$build_dir/graphs.txt && cd $build_dir
-if [ -f time_values.txt ]
+cd $benchmark_dir && ls | grep 'rgg_n_2_[1-2][0|5-9|1-2]'>$build_dir/graphs.txt && cd $build_dir
+if [ -f time_values.dat ]
     then
         rm time_values.dat 
 fi
@@ -88,7 +88,7 @@ fi
 i=1
 while read -r g; do
     echo "Simulation number: $i" 
-    runlim -o analisi.txt -t 600 ./pds_project $1 $2 $3 $g || print_value_sofar #time limit a 10 min 
+    runlim -o analisi.txt -r 600 ./pds_project $1 $2 $3 $g || print_value_sofar #time limit a 10 min 
     sed -i -e 's/\[runlim\]//g' analisi.txt
     let i=$i+14
     while read -r descr val; do
@@ -132,6 +132,6 @@ if [ ! -d "$build_dir/test_immages" ]; then
     mkdir test_immages
 fi
 
-mv $a* "test_immages/$a"
+mv *.png "test_immages/$a"
 
 exit 0
