@@ -16,8 +16,7 @@ such that for each (u,v) in E C(v) <> C(u).
 2. [Usage](#usage)
 ---
 ## Build instructions <a name="building"></a>
-This project can be executed either on windows or linux os.
-
+This project can be run on both windows and linux operating systems
 
 ### Linux <a name="linux_build"></a>
 
@@ -60,12 +59,14 @@ $ cmake .. && make
 
 ## Usage <a name="usage"></a>
 
-Regardless of whether you are using linux or windows, you have to put the
-benchmarks folder inside a specific folder.
+Regardless of whether you are using linux or windows, you must put the
+benchmark folder inside a specific folder.
 As far as windows is concerned 
 the folder is: "C:" while in linux is: "/home/username" or
 the well known "~".
 There are actually two ways of executing the program:
 1. without arguments, the program will guide the user
-2. with arguments(rappresentation,algorithm,no. threads, file name). We used this for testing
+2. with arguments(representation,algorithm,no. threads, file name). 
+
+
 
